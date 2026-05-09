@@ -1,9 +1,13 @@
 ﻿using System;
 
-public interface IAcadDocument
+namespace LP.Core.Interfaces
 {
-    string Name { get; }
-    void ExecuteInTransaction(Action<IAcadTransaction> action);
-    object GetModelSpace();
-    void Regen();
+
+    public interface IAcadDocument
+    {
+        string Name { get; }
+        void ExecuteInTransaction(Action<IAcadTransaction> action);
+        object GetModelSpace();
+        void Regen();
+    }
 }

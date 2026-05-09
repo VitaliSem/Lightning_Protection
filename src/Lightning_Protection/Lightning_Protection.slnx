@@ -1,5 +1,6 @@
 <Solution>
-  <Project Path="LP.Core/LP.Core.csproj" />`n  <Project Path="LP.Core.Tests/LP.Core.Tests.csproj" />
+  <Project Path="LP.Core/LP.Core.csproj" />
+  <Project Path="LP.Core.Tests/LP.Core.Tests.csproj" />
   <Project Path="LP.Plugin.Framework/LP.Plugin.Framework.csproj" Id="36a9eebc-a091-4123-a697-b92d36f92be7" />
   <Project Path="LP.Plugin.Net8/LP.Plugin.Net8.csproj" Id="43842b85-3a26-41ed-99d8-a3b7e1ef0bfe" />
   <Project Path="LP.UI/LP.UI.csproj" Id="f50c97a9-9d73-4ade-8eb6-915d9165ee91" />
