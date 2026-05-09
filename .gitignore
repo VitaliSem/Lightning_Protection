@@ -23,6 +23,8 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+.vs/
+
 # .NET Core
 project.lock.json
 project.fragment.lock.json
@@ -30,6 +32,12 @@ artifacts/
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
+
+# Ignore the local NuGet packages folder
+**/packages/*
+
+# But keep the build targets if they are needed for compilation
+!**/packages/build/
 
 # NuGet Packages
 *.nupkg
