@@ -22,6 +22,9 @@ namespace LP.Core.Services
         {
             try
             {
+                if (protector == null)
+                    return OperationResult<SingleRodProtectionArea>.Fail("Protector cannot be null.");
+
                 double h = protector.Height;
 
                 if (h <= 0)
@@ -37,6 +40,10 @@ namespace LP.Core.Services
                     return OperationResult<SingleRodProtectionArea>.Fail("Calculation height hx must be less than the protector height.");
 
                 double h0 = CalculateConeHeight(h, reliability);
+
+                if (hx >= h0)
+                    return OperationResult<SingleRodProtectionArea>.Ok(new SingleRodProtectionArea(protector.Position, 0));
+
                 double r0 = CalculateConeBaseRadius(h, reliability);
 
                 double rx = r0 * (h0 - hx) / h0;
