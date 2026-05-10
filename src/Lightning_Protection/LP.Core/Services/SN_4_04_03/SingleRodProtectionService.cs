@@ -3,7 +3,7 @@ using LP.Core.Enums;
 using LP.Core.Models.Base;
 using LP.Core.Models.LightningProtectors;
 
-namespace LP.Core.Services
+namespace LP.Core.Services.SN_4_04_03
 {
     public static class SingleRodProtectionService
     {
