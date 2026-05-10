@@ -235,7 +235,7 @@ public class SingleWireProtectionServiceTests
     // -------------------------------------------------------------------------
 
     [Fact]
-    public void Calculate_HxExceedsConeHeight_ReturnsZeroRadius()
+    public void Calculate_HxExceedsConeHeight_ReturnsFail()
     {
         // h=20, P0_900: h0=0.87*20=17.4, hx=18 => rx=0
         var result = SingleWireProtectionService.Calculate(MakeSymmetricProtector(20), LightningProtectionReliability.P0_900, 18);
