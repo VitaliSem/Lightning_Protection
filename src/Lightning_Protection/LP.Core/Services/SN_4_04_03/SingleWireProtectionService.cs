@@ -23,6 +23,9 @@ namespace LP.Core.Services.SN_4_04_03
         {
             try
             {
+                if (protector == null)
+                    return OperationResult<SingleWireProtectionArea>.Fail("Protector cannot be null.");
+
                 if (protector.Height1 <= 0 || protector.Height2 <= 0)
                     return OperationResult<SingleWireProtectionArea>.Fail("Protector heights must be greater than zero.");
 
@@ -96,7 +99,7 @@ namespace LP.Core.Services.SN_4_04_03
                 if (d == 0)
                     return OperationResult<ProtectionArea>.Fail("The two pinning points cannot be at the same location.");
 
-                if (d < Math.Abs(r1 - r2))
+                if (d <= Math.Abs(r1 - r2))
                     return OperationResult<ProtectionArea>.Fail("One circle is contained within the other; no external tangent exists.");
 
                 // θ — angle of the line of centres relative to the horizontal X axis
