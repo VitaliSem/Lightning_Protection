@@ -1,6 +1,6 @@
 using LP.Core.Models.Base;
 
-namespace LP.Core.Models.LightningProtectors
+namespace LP.Core.Models.LightningProtectors.SingleWire
 {
     public class SingleWireLightningProtector
     {

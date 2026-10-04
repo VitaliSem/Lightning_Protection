@@ -1,4 +1,6 @@
-namespace LP.Core.Models.LightningProtectors
+using LP.Core.Models.LightningProtectors.SingleWire;
+
+namespace LP.Core.Models.LightningProtectors.DoubleWire
 {
     public class DoubleWireLightningProtector
     {
