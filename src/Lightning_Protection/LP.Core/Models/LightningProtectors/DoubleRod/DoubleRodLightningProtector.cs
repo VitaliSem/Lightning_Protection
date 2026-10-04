@@ -1,4 +1,6 @@
-namespace LP.Core.Models.LightningProtectors
+using LP.Core.Models.LightningProtectors.SingleRod;
+
+namespace LP.Core.Models.LightningProtectors.DoubleRod
 {
     public class DoubleRodLightningProtector
     {

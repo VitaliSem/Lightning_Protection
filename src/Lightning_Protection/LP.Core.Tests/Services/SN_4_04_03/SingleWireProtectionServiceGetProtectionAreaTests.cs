@@ -1,6 +1,6 @@
 using System;
 using LP.Core.Models.Base;
-using LP.Core.Models.LightningProtectors;
+using LP.Core.Models.LightningProtectors.SingleWire;
 using LP.Core.Services;
 using LP.Core.Services.SN_4_04_03;
 

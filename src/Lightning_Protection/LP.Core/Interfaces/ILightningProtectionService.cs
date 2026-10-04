@@ -1,6 +1,9 @@
 using LP.Core.Enums;
 using LP.Core.Models.Base;
-using LP.Core.Models.LightningProtectors;
+using LP.Core.Models.LightningProtectors.DoubleRod;
+using LP.Core.Models.LightningProtectors.DoubleWire;
+using LP.Core.Models.LightningProtectors.SingleRod;
+using LP.Core.Models.LightningProtectors.SingleWire;
 
 namespace LP.Core.Interfaces
 {

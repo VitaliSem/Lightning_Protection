@@ -1,7 +1,7 @@
 using System;
 using LP.Core.Enums;
 using LP.Core.Models.Base;
-using LP.Core.Models.LightningProtectors;
+using LP.Core.Models.LightningProtectors.SingleRod;
 
 namespace LP.Core.Services.SN_4_04_03
 {
@@ -58,7 +58,7 @@ namespace LP.Core.Services.SN_4_04_03
             }
         }
 
-        private static double CalculateConeHeight(double h, LightningProtectionReliability reliability)
+        public static double CalculateConeHeight(double h, LightningProtectionReliability reliability)
         {
             switch (reliability)
             {
@@ -85,7 +85,7 @@ namespace LP.Core.Services.SN_4_04_03
             }
         }
 
-        private static double CalculateConeBaseRadius(double h, LightningProtectionReliability reliability)
+        public static double CalculateConeBaseRadius(double h, LightningProtectionReliability reliability)
         {
             switch (reliability)
             {

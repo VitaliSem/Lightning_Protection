@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using LP.Core.Enums;
 using LP.Core.Models.Base;
-using LP.Core.Models.LightningProtectors;
+using LP.Core.Models.LightningProtectors.SingleWire;
 
 namespace LP.Core.Services.SN_4_04_03
 {

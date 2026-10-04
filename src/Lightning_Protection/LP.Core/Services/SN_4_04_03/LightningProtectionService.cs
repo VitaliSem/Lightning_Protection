@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using LP.Core.Enums;
 using LP.Core.Interfaces;
 using LP.Core.Models.Base;
-using LP.Core.Models.LightningProtectors;
+using LP.Core.Models.LightningProtectors.DoubleRod;
+using LP.Core.Models.LightningProtectors.DoubleWire;
+using LP.Core.Models.LightningProtectors.SingleRod;
+using LP.Core.Models.LightningProtectors.SingleWire;
 
 namespace LP.Core.Services.SN_4_04_03
 {
@@ -46,7 +49,12 @@ namespace LP.Core.Services.SN_4_04_03
             LightningProtectionReliability reliability,
             double hx)
         {
-            throw new NotImplementedException("Double rod protection area calculation is not implemented yet.");
+            var calcResult = DoubleRodProtectionService.Calculate(protector, reliability, hx);
+
+            if (!calcResult.IsSuccess)
+                return OperationResult<ProtectionArea>.Fail(calcResult.Message, calcResult.Exception);
+
+            return DoubleRodProtectionService.GetProtectionArea(calcResult.Result);
         }
 
         public OperationResult<ProtectionArea> GetDoubleWireProtectionArea(
