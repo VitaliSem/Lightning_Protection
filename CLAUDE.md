@@ -108,8 +108,8 @@ Service implementations (`LP.Core/Services/SN_4_04_03/`):
 
 ### AutoCAD Integration
 
-- `LP.Plugin` is currently a stub (project file only). It has **no `ProjectReference` to LP.Core yet** — add `<ProjectReference Include="..\LP.Core\LP.Core.csproj" />` before calling the calculation services.
-- Suggested layout inside LP.Plugin: `Acad/` (API helpers, `IAcadDocument` implementation), `Drawing/` (ProtectionArea → AutoCAD entities), `Commands/` (`[CommandMethod]` classes).
+- `LP.Plugin` references LP.Core. Layout: `Acad/` (API helpers adapted from the `autocad-api` skill: `BlockHelper` (definitions, inserts, references), `BlockAttributeHelper` (attribute definitions and references), `LayerHelper`, `ScaleHelper`, `PromptHelper` (reusable `TryGet...` editor prompts for commands)), `Drawing/` (block definitions, ProtectionArea → AutoCAD entities), `Commands/` (`[CommandMethod]` classes, each with a `<Name>Prompts` class holding its prompt texts and prompt DTOs), `Models/` (DTOs: `LayerDto`, `BlockDefinitionDto`, `AttributeDefinitionDto`, `BlockInsertDto`, `TextPromptDto`, `NumberPromptDto`). Methods that would take more than 3 parameters take a DTO instead. `Constants/` holds names that must not be hard-coded elsewhere: `AcadConstants` (AutoCAD key names such as object context collections) and `CommandNames` (names of `[CommandMethod]` commands).
+- `lightning_protector_insert` (`Commands/LightningProtectorCommands`) inserts the annotative block `B_LP_Lightning_Protector` (layer `L_LP_Lightning_Protectors`, created on demand by `Drawing/LightningProtectorBlock`). Names, attribute tags, numbering and height validation live in `LP.Core/Services/LightningProtectorBlockService`.
 - The AutoCAD abstractions in `LP.Core` (`IAcadDocument`, `IAcadTransaction`) are the bridge between calculation logic and the AutoCAD API; LP.Plugin supplies the concrete implementations.
 - Code in LP.Plugin must compile for both targets:
   - use `Autodesk.AutoCAD.ApplicationServices.Core.Application` (AcCoreMgd) — the full `ApplicationServices.Application` lives in AcMgd, which the `net8.0` target does not reference;
@@ -121,6 +121,10 @@ Service implementations (`LP.Core/Services/SN_4_04_03/`):
 
 - `netstandard2.0` LP.Core means **no nullable reference types and no implicit usings** there — write explicit `using` directives and C# 7.3-compatible code in LP.Core. LP.Core.Tests and LP.Plugin use implicit usings and nullable.
 - Callers check `OperationResult.IsSuccess` and propagate `Message` / `Exception`; don't throw across project boundaries.
+- `/// <summary>` comments on methods:
+  - add one only when the method has complex logic. Leave out summaries on simple or self-explanatory methods (getters, thin wrappers, one-line lookups);
+  - keep it to an abstract description of what the method does. Leave out implementation details such as property or parameter names, concrete values and constants, or step-by-step behaviour.
+- No `/// <summary>` comments on properties or on data types (DTOs and models, such as those in `LP.Plugin/Models/`).
 
 ### Implementation Status
 
@@ -128,4 +132,4 @@ Service implementations (`LP.Core/Services/SN_4_04_03/`):
 - Single wire protection area — **complete** (Table 10.2, including tangent-line geometry)
 - Double rod protection area — **implemented** (`DoubleRodProtectionService`, with tests); geometry of the combined outline still to be verified against the standard
 - Double wire protection area — **not implemented** (throws `NotImplementedException`)
-- AutoCAD plugin (`LP.Plugin`) — **stub**, no commands yet
+- AutoCAD plugin (`LP.Plugin`) — **in progress**: `lightning_protector_insert` implemented; protection-area drawing commands not yet
