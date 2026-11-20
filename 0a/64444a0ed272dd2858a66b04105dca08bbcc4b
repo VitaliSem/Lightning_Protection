@@ -1,0 +1,48 @@
+src/Lightning_Protection/LP.Core.Tests/Services/LightningProtectorBlockServiceTests.cs
+  h_aad0f873e1dc77 1-109,188-203,206,218-240
+  s_b6183fc5bb6a91::t_0c723d531bdd42 110-187,204-205,207-217
+src/Lightning_Protection/LP.Plugin/Commands/LightningProtectorCommands.cs
+  h_aad0f873e1dc77 1-39,43-100,105,124,126-127,129,131,133-134,136-167
+  s_b6183fc5bb6a91::t_6c2e9035fdd12d 40-42,101-104,106-123,125,128,130,132,135
+src/Lightning_Protection/LP.Plugin/Acad/BlockHelper.cs
+  h_aad0f873e1dc77 1-65,68-169,172-249
+  s_b6183fc5bb6a91::t_1efa39195962de 66-67,170-171
+src/Lightning_Protection/LP.Plugin/Acad/LayerHelper.cs
+  h_aad0f873e1dc77 1-42
+src/Lightning_Protection/LP.Plugin/Drawing/LightningProtectorBlock.cs
+  h_aad0f873e1dc77 1-60,67
+  s_b6183fc5bb6a91::t_dfabc6022aaae4 61-66
+src/Lightning_Protection/LP.Plugin/LP.Plugin.csproj
+  h_aad0f873e1dc77 23-26
+src/Lightning_Protection/LP.Core/Models/LightningProtectors/Block/LightningProtectorBlockData.cs
+  h_aad0f873e1dc77 1-8,11-20,23-25
+  s_b6183fc5bb6a91::t_b3cd09330fc1d7 9-10,21-22
+CLAUDE.md
+  h_aad0f873e1dc77 111-112,131
+src/Lightning_Protection/LP.Plugin/Acad/ScaleHelper.cs
+  h_aad0f873e1dc77 1-75
+src/Lightning_Protection/LP.Core/Services/LightningProtectorBlockService.cs
+  h_aad0f873e1dc77 1-20,23-26,43-73,75-83,94-100,102-123,128-132
+  s_b6183fc5bb6a91::t_d725f0f584c703 21-22,27-42,74,84-93,101,124-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0a64444a0ed272dd2858a66b04105dca08bbcc4b",
+  "prompts": {},
+  "humans": {
+    "h_aad0f873e1dc77": {
+      "author": "Vitali.Siamashka <vitali.siamashka@ventionteams.com>"
+    }
+  },
+  "sessions": {
+    "s_b6183fc5bb6a91": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "26db2cb1-ae5c-43e4-a0e8-092be27b9d42",
+        "model": "unknown"
+      },
+      "human_author": "Vitali.Siamashka <vitali.siamashka@ventionteams.com>"
+    }
+  }
+}
