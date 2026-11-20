@@ -1,0 +1,32 @@
+CLAUDE.md
+  h_aad0f873e1dc77 111-112,131
+src/Lightning_Protection/LP.Core.Tests/Services/LightningProtectorBlockServiceTests.cs
+  h_aad0f873e1dc77 1-149
+src/Lightning_Protection/LP.Core/Models/LightningProtectors/Block/LightningProtectorBlockData.cs
+  h_aad0f873e1dc77 1-20
+src/Lightning_Protection/LP.Core/Services/LightningProtectorBlockService.cs
+  h_aad0f873e1dc77 1-96
+src/Lightning_Protection/LP.Plugin/Acad/BlockHelper.cs
+  h_aad0f873e1dc77 1-242
+src/Lightning_Protection/LP.Plugin/Acad/LayerHelper.cs
+  h_aad0f873e1dc77 1-42
+src/Lightning_Protection/LP.Plugin/Acad/ScaleHelper.cs
+  h_aad0f873e1dc77 1-75
+src/Lightning_Protection/LP.Plugin/Commands/LightningProtectorCommands.cs
+  h_aad0f873e1dc77 1-129
+src/Lightning_Protection/LP.Plugin/Drawing/LightningProtectorBlock.cs
+  h_aad0f873e1dc77 1-62
+src/Lightning_Protection/LP.Plugin/LP.Plugin.csproj
+  h_aad0f873e1dc77 23-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a32b84fc40a16b4b65b847ded0b4189f3dc34999",
+  "prompts": {},
+  "humans": {
+    "h_aad0f873e1dc77": {
+      "author": "Vitali.Siamashka <vitali.siamashka@ventionteams.com>"
+    }
+  }
+}
