@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Молниезащита для AutoCAD — макеты интерфейса v2</title>
+<style>
+:root{
+  --accent:#0067C0; --accent-h:#1975C5; --accent-l:#E5F0FA;
+  --bg:#F3F3F3; --card:#FFFFFF; --border:#D6D6D6; --border-s:#E8E8E8;
+  --text:#1B1B1B; --muted:#5F6368; --dis:#A0A0A0;
+  --ok:#0F7B0F; --danger:#C42B1C; --danger-l:#FDE7E9;
+  --side:#EBEEF2; --cad:#212830;
+}
+*{box-sizing:border-box}
+body{margin:0;font:13px/1.35 "Segoe UI",system-ui,-apple-system,Arial,sans-serif;color:var(--text);background:#1a1f26;display:flex;height:100vh;overflow:hidden}
+
+#nav{width:270px;background:#11151a;color:#cfd6de;padding:18px 14px;overflow:auto;flex-shrink:0;border-right:1px solid #2a323c}
+#nav h1{font-size:15px;margin:0 0 4px;color:#fff;font-weight:600}
+#nav .sub{font-size:11.5px;color:#7d8894;margin-bottom:14px}
+#nav button{display:block;width:100%;text-align:left;background:none;border:1px solid transparent;color:#cfd6de;padding:7px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;font:inherit}
+#nav button b{display:block;font-weight:600;color:#fff;font-size:12.5px}
+#nav button span{font-size:11.5px;color:#8b96a3}
+#nav button:hover{background:#1c232c}
+#nav button.on{background:#1f3550;border-color:#2f5d8f}
+#nav .note{margin-top:14px;font-size:11.5px;color:#7d8894;border-top:1px solid #2a323c;padding-top:12px}
+#nav .note code{color:#9cc4ec}
+
+#cad{flex:1;position:relative;background:var(--cad);overflow:hidden}
+#cad svg.draw{position:absolute;inset:0;width:100%;height:100%}
+.cadbar{position:absolute;left:0;right:0;bottom:0;height:26px;background:#2b333d;color:#aab4bf;font-size:11.5px;display:flex;align-items:center;padding:0 12px;gap:18px;border-top:1px solid #3a444f}
+.cadcmd{position:absolute;left:12px;right:12px;bottom:34px;background:rgba(30,36,44,.92);border:1px solid #3a444f;color:#cdd5dd;font:12px Consolas,monospace;padding:6px 10px;border-radius:3px}
+#hl{transition:opacity .3s}
+
+.win{position:absolute;top:20px;left:30px;width:760px;background:var(--bg);border:1px solid #8a8a8a;border-radius:8px;box-shadow:0 20px 50px rgba(0,0,0,.55);display:flex;flex-direction:column;height:calc(100% - 84px);max-height:860px;overflow:hidden}
+.title{height:32px;display:flex;align-items:center;background:#fff;border-bottom:1px solid var(--border-s);user-select:none;flex-shrink:0}
+.title .ic{width:32px;display:flex;justify-content:center}
+.title .t{flex:1;font-size:12px}
+.title .cap{width:46px;height:32px;display:flex;align-items:center;justify-content:center;color:#333;font-size:13px;cursor:default}
+.title .cap:hover{background:#e9e9e9}
+.title .cap.close:hover{background:#C42B1C;color:#fff}
+.title .cap.max{color:#c8c8c8;cursor:not-allowed}
+.title .cap.max:hover{background:none}
+.shell{flex:1;display:flex;min-height:0}
+
+.side{width:178px;flex-shrink:0;background:var(--side);border-right:1px solid #DADFE5;display:flex;flex-direction:column;padding:10px 8px}
+.side .cap2{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:2px 8px 8px}
+.nitem{display:flex;gap:8px;align-items:flex-start;padding:8px;border-radius:5px;cursor:pointer;position:relative;margin-bottom:2px}
+.nitem:hover{background:#E0E5EB}
+.nitem.on{background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.nitem.on:before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:2px;background:var(--accent)}
+.nitem svg{flex-shrink:0;margin-top:1px;color:#55606c}
+.nitem.on svg{color:var(--accent)}
+.nitem b{display:block;font-size:12.5px;font-weight:600}
+.nitem span{display:block;font-size:11px;color:var(--muted)}
+.side .sp{flex:1}
+.side .sep{height:1px;background:#D3D9E0;margin:6px 4px 8px}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.body{flex:1;overflow:auto;padding:10px}
+.foot{flex-shrink:0;background:#fff;border-top:1px solid var(--border-s)}
+.actions{display:flex;gap:8px;padding:10px}
+.status{display:flex;gap:12px;font-size:11px;color:var(--muted);padding:4px 10px;border-top:1px solid var(--border-s);background:#FAFAFA;flex-shrink:0}
+.status .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:4px;vertical-align:1px}
+
+.card{background:var(--card);border:1px solid var(--border-s);border-radius:6px;margin-bottom:10px}
+.card-h{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border-s);font-weight:600}
+.card-b{padding:10px}
+.lbl{font-size:11.5px;color:var(--muted);margin:0 0 4px;display:block}
+.row{display:flex;gap:8px;align-items:center}
+.field{margin-bottom:12px}
+.hint{font-size:11px;color:var(--muted);margin-top:4px}
+.h2{font-size:15px;font-weight:600;margin:2px 0 10px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:1px solid var(--border);background:#FDFDFD;border-radius:4px;font:inherit;font-size:12.5px;color:var(--text);cursor:pointer;white-space:nowrap}
+.btn:hover{background:#F5F5F5}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover{background:var(--accent-h)}
+.btn.dng{color:var(--danger);border-color:#e3b3ae}
+.btn.dng:hover{background:var(--danger-l)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.ghost:hover{background:#DCE8F4;color:var(--accent)}
+.btn.ico{width:28px;padding:0;justify-content:center}
+.btn.sm{height:24px;width:24px}
+.btn[disabled]{color:var(--dis);cursor:default;background:#F7F7F7}
+.inp,.sel{height:28px;border:1px solid var(--border);border-bottom-color:#8a8a8a;border-radius:4px;padding:0 8px;font:inherit;font-size:12.5px;background:#fff;width:100%}
+.inp:focus,.sel:focus{outline:none;border-bottom:2px solid var(--accent)}
+.inp[disabled]{background:#F5F5F5;color:var(--muted)}
+.unit{position:relative}
+.unit .inp{padding-right:28px}
+.unit i{position:absolute;right:8px;top:6px;font-style:normal;color:var(--muted);font-size:12px}
+.chk{display:flex;align-items:center;gap:6px;font-size:12.5px;margin:4px 0;cursor:pointer}
+.chk input{accent-color:var(--accent);margin:0}
+.chk.dis{color:var(--dis);cursor:default}
+
+/* toggle button */
+.tgl{min-width:112px}
+.tgl .sw{width:30px;height:16px;border-radius:8px;background:var(--accent);position:relative;flex-shrink:0;transition:.15s}
+.tgl .sw:after{content:"";position:absolute;top:3px;left:17px;width:10px;height:10px;border-radius:50%;background:#fff;transition:.15s}
+.tgl.off{background:#E9E9E9;border-color:#B5B5B5;box-shadow:inset 0 1px 3px rgba(0,0,0,.15)}
+.tgl.off:hover{background:#E2E2E2}
+.tgl.off .sw{background:#fff;border:1px solid #8a8a8a}
+.tgl.off .sw:after{left:2px;top:2px;background:#5f5f5f}
+.tgl .st{font-weight:600}
+.tgl.on .st{color:var(--accent)}
+.tgl.off .st{color:#5f5f5f}
+
+.tb{display:flex;gap:4px;padding:8px 10px;align-items:center}
+.tb .sep{width:1px;height:20px;background:var(--border-s);margin:0 2px}
+.tb .btn{padding:0 8px;gap:5px}
+.tb{gap:3px!important}
+.tb .grow{flex:1}
+
+.acc{display:flex;align-items:center;gap:8px;padding:5px 10px;border-top:1px solid var(--border-s);user-select:none;font-size:12.5px}
+.acc:hover{background:#F7F9FB}
+.acc .chev{transition:transform .2s;color:var(--muted);display:flex;transform:rotate(-90deg)}
+.acc.open .chev{transform:rotate(0)}
+.acc b{font-weight:600}
+.acc .cnt{color:var(--muted);font-size:11.5px}
+.acc .sum{margin-left:auto;font-size:11.5px;color:var(--muted)}
+
+table.grid{width:100%;border-collapse:collapse;font-size:12px}
+table.grid th{font-weight:600;text-align:left;color:var(--muted);font-size:11px;padding:5px 8px;background:#FAFAFA;border-bottom:1px solid var(--border-s);border-top:1px solid var(--border-s);position:sticky;top:0;z-index:1}
+table.grid td{padding:3px 8px;border-bottom:1px solid #F1F1F1;height:31px}
+table.grid tr.cur td{background:var(--accent-l)}
+table.grid tr.off td{color:var(--dis)}
+table.grid tr:hover td{background:#F6F9FC;cursor:default}
+table.grid tr.cur:hover td{background:var(--accent-l)}
+table.grid td.go,table.grid th.go{width:40px;text-align:center;padding:3px 4px}
+.tw{overflow:auto}
+.rodcard{margin-bottom:6px}
+.stt{display:inline-flex;align-items:center;gap:5px;font-size:11.5px}
+.stt:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.stt.off{color:#8a8a8a}.stt.off:before{background:transparent;border:1.5px solid #9a9a9a;width:6px;height:6px}
+
+.doc{display:flex;gap:10px;align-items:flex-start;padding:10px;border-bottom:1px solid var(--border-s)}
+.doc svg{color:var(--accent);flex-shrink:0}
+.doc b{display:block;font-size:13px}
+.doc span{font-size:11.5px;color:var(--muted)}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.seg div{border:1px solid var(--border);border-radius:5px;padding:7px 4px 6px;text-align:center;cursor:pointer;font-size:11.5px;background:#fff}
+.seg div svg{display:block;margin:0 auto 3px}
+.seg div:hover{border-color:#9bbfe0}
+.seg div.on{border-color:var(--accent);background:var(--accent-l);color:#003E73;font-weight:600;box-shadow:inset 0 0 0 1px var(--accent)}
+.rel{display:flex;gap:6px;flex-wrap:wrap}
+.rel label{flex:1;min-width:70px;border:1px solid var(--border);border-radius:5px;padding:5px 6px;text-align:center;cursor:pointer;font-size:12px;background:#fff}
+.rel label small{display:block;color:var(--muted);font-size:10.5px}
+.rel input{display:none}
+.rel label.on{border-color:var(--accent);background:var(--accent-l);box-shadow:inset 0 0 0 1px var(--accent)}
+.pick{display:grid;grid-template-columns:22px 1fr 28px;gap:6px;align-items:center;margin-bottom:6px}
+.pick .n{width:20px;height:20px;border-radius:50%;background:#EEE;font-size:11px;display:flex;align-items:center;justify-content:center;color:#555}
+.multi{border:1px solid var(--border);border-radius:5px;max-height:150px;overflow:auto}
+.multi .it{display:flex;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px solid #F1F1F1;font-size:12px}
+.multi .it:last-child{border-bottom:none}
+.multi .it .h{margin-left:auto;color:var(--muted)}
+.multi .it.dis{color:var(--dis);background:#FAFAFA}
+.info{display:flex;gap:6px;font-size:11.5px;padding:6px 8px;border-radius:4px;background:#FFF4CE;color:#5c4300;margin-top:6px}
+.info.blue{background:#EAF3FB;color:#0b3d6b}
+.info.err{background:var(--danger-l);color:var(--danger)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+.ovl{position:absolute;inset:0;background:rgba(0,0,0,.25);display:none;align-items:center;justify-content:center;z-index:5}
+.ovl.on{display:flex}
+.dlg{background:var(--bg);border:1px solid #8a8a8a;border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,.4);width:400px;max-height:92%;display:flex;flex-direction:column;overflow:hidden}
+.dlg.wide{width:440px}
+.dlg .title{border-radius:8px 8px 0 0}
+.dlg .db{padding:12px;overflow:auto}
+.dlg .df{display:flex;justify-content:flex-end;gap:8px;padding:10px 12px;background:#fff;border-top:1px solid var(--border-s)}
+.catlist .it{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;padding:7px 8px;border-bottom:1px solid #F1F1F1;cursor:pointer}
+.catlist .it:hover{background:#F6F9FC}
+.catlist .it.cur{background:var(--accent-l)}
+.catlist .it b{font-weight:600;font-size:12.5px;display:block}
+.catlist .it span{font-size:11px;color:var(--muted)}
+.thumb{width:34px;height:34px;border-radius:4px;background:#F1F4F7;display:flex;align-items:center;justify-content:center}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px;border:1px solid var(--border);border-radius:5px;margin-bottom:6px;cursor:pointer;background:#fff}
+.opt.on{border-color:var(--accent);background:var(--accent-l)}
+.opt b{display:block;font-size:12.5px}.opt span{font-size:11.5px;color:var(--muted)}
+.opt input{accent-color:var(--accent);margin-top:2px}
+
+.ann{position:absolute;right:16px;top:16px;width:290px;color:#c9d2db;font-size:12px;background:rgba(17,21,26,.9);border:1px solid #2f3a46;border-radius:6px;padding:12px 14px}
+.ann h3{margin:0 0 6px;font-size:13px;color:#fff}
+.ann ul{margin:0;padding-left:16px}
+.ann li{margin-bottom:4px}
+@media (max-width:1250px){.ann{display:none}}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <h1>⚡ Молниезащита · UI v2</h1>
+  <div class="sub">Макеты WPF-окна плагина AutoCAD. Окно интерактивно: сайдбар, раздел МП, переключатель активности, переход к МП.</div>
+  <div id="navlist"></div>
+  <div class="note">Окно: <code>ResizeMode="CanMinimize"</code> — кнопка «Развернуть» отключена, режим только оконный. Окно немодальное.</div>
+</nav>
+
+<main id="cad">
+  <svg class="draw" viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid slice">
+    <defs><pattern id="g" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#2a323d"/></pattern></defs>
+    <rect width="1200" height="900" fill="url(#g)"/>
+    <g transform="translate(330,170) scale(.8)">
+      <rect x="560" y="330" width="260" height="170" fill="none" stroke="#e8e8e8" stroke-width="1.8"/>
+      <rect x="840" y="560" width="150" height="110" fill="none" stroke="#e8e8e8" stroke-width="1.8"/>
+      <circle cx="560" cy="330" r="150" fill="rgba(0,180,255,.07)" stroke="#36b3ff" stroke-dasharray="8 5"/>
+      <circle cx="820" cy="500" r="150" fill="rgba(0,180,255,.07)" stroke="#36b3ff" stroke-dasharray="8 5"/>
+      <g font-family="Consolas,monospace" font-size="14" id="rodsvg"></g>
+      <circle id="hl" cx="560" cy="330" r="34" fill="none" stroke="#7CFF7C" stroke-width="2.5" opacity="0"/>
+    </g>
+  </svg>
+  <div class="cadcmd" id="cmdline">Команда: LPZONE</div>
+  <div class="cadbar"><span>МОДЕЛЬ</span><span>Лист1</span><span style="margin-left:auto">X=1250.40 Y=830.12 Z=0.00</span><span>1:100</span></div>
+
+  <div class="win">
+    <div class="title">
+      <div class="ic"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M9 1 3 9h4l-1 6 6-8H8l1-6z" fill="#F2B300" stroke="#9a6d00" stroke-width=".6"/></svg></div>
+      <div class="t">Молниезащита — расчёт зон</div>
+      <div class="cap" title="Свернуть">&#8212;</div>
+      <div class="cap max" title="Недоступно: только оконный режим">&#9744;</div>
+      <div class="cap close" title="Закрыть">&#10005;</div>
+    </div>
+    <div class="shell">
+      <aside class="side" id="side"></aside>
+      <div class="main">
+        <div class="body" id="body"></div>
+        <div class="foot" id="foot"></div>
+      </div>
+    </div>
+    <div class="status" id="status"></div>
+    <div class="ovl" id="ovl"></div>
+  </div>
+
+  <div class="ann" id="ann"></div>
+</main>
+
+<script>
+const rods=[
+ {id:'МП-1',name:'Стержень МС-30',type:'Стержневой',h:30,x:'1250.0',y:'830.0',on:true, p:[560,330]},
+ {id:'МП-2',name:'Стержень МС-30',type:'Стержневой',h:30,x:'1510.0',y:'660.0',on:true, p:[820,500]},
+ {id:'МП-3',name:'Стержень МС-25',type:'Стержневой',h:25,x:'1680.0',y:'600.0',on:false,p:[990,560]},
+ {id:'МП-4',name:'Мачта ММ-40',type:'Мачта',h:40,x:'1390.0',y:'440.0',on:true, p:[700,720]},
+ {id:'МП-5',name:'Опора троса ОТ-20',type:'Опора троса',h:20,x:'1300.0',y:'1005.0',on:true,p:[610,161]},
+ {id:'МП-6',name:'Опора троса ОТ-20',type:'Опора троса',h:20,x:'1570.0',y:'945.0',on:true, p:[880,221]},
+];
+const norms={
+ so153:{code:'СО 153-34.21.122',sub:'РФ · 2003',title:'СО 153-34.21.122-2003',desc:'Инструкция по устройству молниезащиты зданий, сооружений и промышленных коммуникаций',
+   rel:[['0.9','I'],['0.99','II'],['0.999','III']],relLbl:'Надёжность защиты Рз'},
+ rd87:{code:'РД 34.21.122-87',sub:'СССР · 1987',title:'РД 34.21.122-87',desc:'Инструкция по устройству молниезащиты зданий и сооружений',
+   rel:[['Зона А','≥ 0.995'],['Зона Б','≥ 0.95']],relLbl:'Тип зоны защиты'},
+ tkp:{code:'ТКП 336-2011',sub:'РБ · 2011',title:'ТКП 336-2011 (02230)',desc:'Молниезащита зданий, сооружений и инженерных коммуникаций',
+   rel:[['0.9','IV'],['0.98','III'],['0.99','II'],['0.999','I']],relLbl:'Надёжность защиты / класс'},
+ iec:{code:'IEC 62305-3',sub:'Международный',title:'IEC 62305-3:2010',desc:'Protection against lightning — Part 3. Метод защитного угла / катящейся сферы',
+   rel:[['LPL I','R=20 м'],['LPL II','R=30 м'],['LPL III','R=45 м'],['LPL IV','R=60 м']],relLbl:'Уровень молниезащиты (LPL)'},
+};
+const models=[
+ ['single','Одиночный','<svg width="26" height="22"><path d="M13 2v18" stroke="currentColor" stroke-width="2"/><path d="M3 20 13 5 23 20" fill="none" stroke="#36a" stroke-dasharray="2 2"/></svg>'],
+ ['double','Двойной','<svg width="26" height="22"><path d="M7 3v17M19 3v17" stroke="currentColor" stroke-width="2"/><path d="M1 20 7 6 13 12 19 6 25 20" fill="none" stroke="#36a" stroke-dasharray="2 2"/></svg>'],
+ ['cable','Тросовый','<svg width="26" height="22"><path d="M4 4v16M22 4v16" stroke="currentColor" stroke-width="2"/><path d="M4 4Q13 10 22 4" fill="none" stroke="currentColor"/><path d="M1 20 4 9Q13 15 22 9 25 20" fill="none" stroke="#36a" stroke-dasharray="2 2"/></svg>'],
+ ['multi','Множество','<svg width="26" height="22"><path d="M5 6v14M13 3v17M21 8v12" stroke="currentColor" stroke-width="2"/><circle cx="5" cy="6" r="1.5" fill="#36a"/><circle cx="13" cy="3" r="1.5" fill="#36a"/><circle cx="21" cy="8" r="1.5" fill="#36a"/></svg>'],
+];
+const catalog=[
+ ['Стержень МС-6','Стержневой',6,'Стальной оцинкованный, Ø16'],
+ ['Стержень МС-10','Стержневой',10,'Стальной оцинкованный, Ø20'],
+ ['Мачта ММ-25','Мачта',25,'Решётчатая, секционная'],
+ ['Мачта ММ-30','Мачта',30,'Решётчатая, секционная'],
+ ['Мачта ММ-40','Мачта',40,'Решётчатая, с оттяжками'],
+ ['Опора троса ОТ-20','Опора троса',20,'Трос ТК-35, анкерная'],
+ ['Прожекторная мачта ПМ-28','Мачта',28,'С молниеприёмником'],
+];
+
+let S={};
+const base={view:'rods',model:'single',rel:1,hx:10,sel:'МП-1',selRow:0,modal:null,open:true,
+       multi:['МП-1','МП-2','МП-4'],dbOk:true,cat:2,clr:0,zoom:null};
+
+const screens=[
+ {n:'Молниеприёмники',d:'Главный раздел',set:{view:'rods'},
+  ann:['Первый пункт сайдбара — <b>Молниеприёмники</b>: общие операции и таблица МП на чертеже.','Ниже — методики расчёта, внизу — настройки.','Панель: добавить, из каталога, изменить, удалить, переключатель активности.','Правая колонка таблицы — переход к МП на чертеже.']},
+ {n:'Переход к МП на чертеже',d:'Кнопка в правой колонке',set:{view:'rods',selRow:1,zoom:1},
+  ann:['Кнопка ⛶ в строке выбирает МП и выполняет ZOOM к нему на чертеже.','МП подсвечивается на чертеже.','Работает и для неактивных МП.']},
+ {n:'Переключатель: неактивен',d:'Выбран МП-3',set:{view:'rods',selRow:2},
+  ann:['Для неактивного МП кнопка «утоплена»: серый фон, тумблер выключен, подпись «Неактивен».','Повторное нажатие возвращает «Активен».']},
+ {n:'Удаление МП',d:'Подтверждение',set:{view:'rods',selRow:3,modal:'del'},
+  ann:['Удаление выбранного МП с подтверждением.','Зоны, построенные с его участием, удаляются вместе с ним.']},
+ {n:'Добавить МП',d:'Активность недоступна',set:{view:'rods',modal:'add'},
+  ann:['Поля: обозначение (на чертеже), наименование, тип, высота, отметка, положение, описание.','Поле «Описание» — произвольный текст, хранится в атрибутах блока МП.','Чекбокс «Активен» заблокирован: новый МП всегда добавляется активным.']},
+ {n:'Изменить МП',d:'Активность доступна',set:{view:'rods',modal:'edit',selRow:1},
+  ann:['Положение (X, Y и «Указать») заблокировано — в режиме редактирования меняются только свойства.','Наименование и обозначение редактируемы.','«Активен» доступен.']},
+ {n:'Выбор из каталога',d:'Файл БД',set:{view:'rods',modal:'cat'},
+  ann:['В каталоге МП хранятся с <b>наименованием</b>; обозначение присваивается только при вставке на чертёж.','Поле «Наименование» заполняется из выбранной записи и может быть изменено.','«Вставить» → указать точку на чертеже.']},
+ {n:'СО 153 · одиночный',d:'Методика расчёта',set:{view:'so153',model:'single',rel:1},
+  ann:['Раздел методики содержит только параметры расчёта.','Выбор МП — из списка (неактивные недоступны) или ⌖ на чертеже.']},
+ {n:'Двойной молниеприёмник',d:'IEC 62305-3 · LPL I–IV',set:{view:'iec',model:'double',rel:1},
+  ann:['Выбор двух МП из списка или кнопкой ⌖ на чертеже.','Четыре уровня LPL.']},
+ {n:'Тросовый молниеприёмник',d:'ТКП 336-2011',set:{view:'tkp',model:'cable',rel:2},
+  ann:['Две точки подвеса троса — из МП на чертеже.','Доп. параметр — стрела провеса.']},
+ {n:'Множество МП',d:'Выбор селектором',set:{view:'so153',model:'multi',rel:2},
+  ann:['Выбор рамкой на чертеже.','Неактивные МП исключаются и недоступны.']},
+ {n:'РД 34.21.122-87',d:'Зоны А / Б',set:{view:'rd87',rel:0},
+  ann:['Документ с двумя вариантами — тип зоны А или Б.']},
+ {n:'Очистка зон',d:'Все / выбранные',set:{view:'so153',modal:'clear'},
+  ann:['Кнопка «Очистить зоны» — в нижней панели разделов МП и методик.','Варианты: все зоны или выбранные на чертеже.']},
+ {n:'Настройки',d:'Язык, масштаб, БД',set:{view:'settings'},
+  ann:['Открываются кнопкой внизу сайдбара.']},
+ {n:'Настройки: БД не найдена',d:'Состояние ошибки',set:{view:'settings',dbOk:false},
+  ann:['Ошибка подключения файла; «Из каталога» в разделе МП становится неактивной.']},
+];
+
+function icon(n,s=16){const p={
+ add:'<path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6"/>',
+ cat:'<rect x="2.5" y="2.5" width="11" height="11" rx="1.5" fill="none" stroke="currentColor"/><path d="M5 6h6M5 8.5h6M5 11h4" stroke="currentColor"/>',
+ edit:'<path d="M3 13l1-3 6.5-6.5 2 2L6 12z" fill="none" stroke="currentColor"/>',
+ pick:'<circle cx="8" cy="8" r="4" fill="none" stroke="currentColor"/><path d="M8 1v4M8 11v4M1 8h4M11 8h4" stroke="currentColor"/>',
+ goto:'<path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" fill="currentColor"/>',
+ del:'<path d="M4 5h8l-.7 8H4.7zM3 5h10M6 5V3h4v2" fill="none" stroke="currentColor"/>',
+ gear:'<circle cx="8" cy="8" r="2.2" fill="none" stroke="currentColor"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4" stroke="currentColor" stroke-width="1.3"/>',
+ zone:'<path d="M8 2v12" stroke="currentColor" stroke-width="1.5"/><path d="M2 14 8 4 14 14" fill="none" stroke="currentColor"/>',
+ doc:'<path d="M4 1.5h5.5L12.5 4.5V14.5h-8.5z" fill="none" stroke="currentColor"/><path d="M6 7h5M6 9.5h5M6 12h3" stroke="currentColor"/>',
+ chev:'<path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/>',
+ folder:'<path d="M2 4h4l1.5 1.5H14V12H2z" fill="none" stroke="currentColor"/>',
+ search:'<circle cx="7" cy="7" r="4" fill="none" stroke="currentColor"/><path d="M10 10l4 4" stroke="currentColor"/>',
+ x:'<path d="M5 5l6 6M11 5l-6 6" stroke="currentColor" stroke-width="1.3"/>',
+ frame:'<rect x="2.5" y="3.5" width="11" height="9" fill="none" stroke="currentColor" stroke-dasharray="2 1.5"/><path d="M8 6v4M6 8h4" stroke="currentColor"/>',
+};return `<svg width="${s}" height="${s}" viewBox="0 0 16 16">${p[n]}</svg>`}
+
+const $=id=>document.getElementById(id);
+const rodOptions=cur=>rods.map(r=>`<option ${r.on?'':'disabled'} ${r.id==cur?'selected':''}>${r.id} — ${r.type}, h=${r.h} м${r.on?'':' (неактивен)'}</option>`).join('');
+
+function sidebar(){
+  const act=rods.filter(x=>x.on).length;
+  return `<div class="nitem ${S.view=='rods'?'on':''}" onclick="setView('rods')">${icon('zone')}<div><b>Молниеприёмники</b><span>${rods.length} шт · активно ${act}</span></div></div>
+   <div class="sep"></div>
+   <div class="cap2">Методика расчёта</div>
+   ${Object.entries(norms).map(([k,n])=>`<div class="nitem ${S.view==k?'on':''}" onclick="setView('${k}')">${icon('doc')}<div><b>${n.code}</b><span>${n.sub}</span></div></div>`).join('')}
+   <div class="sp"></div><div class="sep"></div>
+   <div class="nitem ${S.view=='settings'?'on':''}" onclick="setView('settings')">${icon('gear')}<div><b>Настройки</b><span>Язык, масштаб, БД</span></div></div>`;
+}
+
+function commonBlock(){
+  const r=rods[S.selRow];
+  return `<div class="h2">Молниеприёмники</div>
+   <div class="card rodcard">
+   <div class="tb">
+     <button class="btn" onclick="openM('add')">${icon('add')}Добавить</button>
+     <button class="btn" ${S.dbOk?'':'disabled title="Подключите файл БД в настройках"'} onclick="openM('cat')">${icon('cat')}Из каталога</button>
+     <span class="sep"></span>
+     <button class="btn" onclick="openM('edit')">${icon('edit')}Изменить</button>
+     <button class="btn" onclick="openM('del')">${icon('del')}Удалить</button>
+     <span class="sep"></span>
+     <button class="btn tgl ${r.on?'on':'off'}" aria-pressed="${!r.on}" title="Переключить активность ${r.id}" onclick="toggleRod()"><span class="sw"></span><span class="st">${r.on?'Активен':'Неактивен'}</span></button>
+   </div>
+   <div class="acc">
+     <b>Список на чертеже</b><span class="cnt">${rods.length} шт · активно ${rods.filter(x=>x.on).length}</span>
+     <span class="sum">Выбран: <b style="color:var(--text)">${r.id}</b></span><button class="btn ghost ico sm" title="Выбрать МП на чертеже">${icon('pick',14)}</button>
+   </div>
+   <div class="tw"><table class="grid">
+     <tr><th style="width:96px">Статус</th><th>Имя</th><th>Тип</th><th>h, м</th><th>X; Y</th><th class="go" title="Перейти на чертеже">${icon('goto',12)}</th></tr>
+     ${rods.map((x,i)=>`<tr class="${i==S.selRow?'cur':''} ${x.on?'':'off'}" onclick="S.selRow=${i};S.zoom=null;render()">
+       <td><span class="stt ${x.on?'':'off'}">${x.on?'Активен':'Неактивен'}</span></td>
+       <td><b>${x.id}</b></td><td>${x.type}</td><td>${x.h}</td><td style="color:var(--muted)">${x.x}; ${x.y}</td>
+       <td class="go"><button class="btn ghost ico sm" title="Показать ${x.id} на чертеже" onclick="event.stopPropagation();zoomTo(${i})" style="${S.zoom==i?'color:var(--accent);background:#DCE8F4':''}">${icon('goto',14)}</button></td></tr>`).join('')}
+   </table></div>
+  </div>
+  <div class="hint">Двойной клик по строке — изменить параметры. Неактивные МП не участвуют в расчётах и недоступны для выбора в методиках.</div>`;
+}
+
+function methodPanel(){
+  const n=norms[S.view];
+  const pk=(l,c)=>`<div class="pick"><div class="n">${l}</div><select class="sel">${rodOptions(c)}</select><button class="btn ico" title="Указать на чертеже">${icon('pick')}</button></div>`;
+  let sel;
+  if(S.model=='single') sel=`<label class="lbl">Молниеприёмник</label>${pk(1,S.sel)}`;
+  else if(S.model=='double') sel=`<label class="lbl">Пара молниеприёмников</label>${pk(1,'МП-1')}${pk(2,'МП-2')}`;
+  else if(S.model=='cable') sel=`<label class="lbl">Точки подвеса троса</label>${pk('A','МП-5')}${pk('B','МП-6')}
+     <div class="g2" style="margin-top:4px"><div><label class="lbl">Длина пролёта</label><div class="unit"><input class="inp" value="276.5" disabled><i>м</i></div></div>
+     <div><label class="lbl">Стрела провеса троса</label><div class="unit"><input class="inp" value="2.0"><i>м</i></div></div></div>`;
+  else sel=`<div class="row" style="margin-bottom:6px"><label class="lbl" style="margin:0;flex:1">Выбранные молниеприёмники (${S.multi.filter(id=>rods.find(r=>r.id==id).on).length})</label>
+       <button class="btn">${icon('frame')}Выбрать на чертеже</button><button class="btn ico" title="Очистить выбор" onclick="S.multi=[];render()">${icon('x')}</button></div>
+     <div class="multi">${rods.map(r=>`<label class="it ${r.on?'':'dis'}"><input type="checkbox" ${S.multi.includes(r.id)&&r.on?'checked':''} ${r.on?'':'disabled'} onchange="tgMulti('${r.id}')" style="accent-color:var(--accent)"> <b>${r.id}</b> ${r.type}${r.on?'':' — неактивен'}<span class="h">h=${r.h} м</span></label>`).join('')}</div>
+     <div class="info">⚠ Неактивные молниеприёмники недоступны для выбора и не участвуют в расчёте.</div>`;
+  return `<div class="card">
+    <div class="doc">${icon('doc',18)}<div><b>${n.title}</b><span>${n.desc}</span></div></div>
+    <div class="card-b">
+     <label class="lbl">Расчётная модель</label>
+     <div class="seg">${models.map(m=>`<div class="${S.model==m[0]?'on':''}" onclick="S.model='${m[0]}';render()">${m[2]}${m[1]}</div>`).join('')}</div>
+     <div class="field">${sel}</div>
+     <div class="field" style="max-width:200px"><label class="lbl">Расчётная высота hx</label><div class="unit"><input class="inp" type="number" value="${S.hx}"><i>м</i></div></div>
+     <div class="field" style="margin-bottom:2px"><label class="lbl">${n.relLbl}</label><div class="rel">${n.rel.map((r,i)=>`<label class="${S.rel==i?'on':''}" onclick="S.rel=${i};render()"><input type="radio">${r[0]}<small>${r[1]}</small></label>`).join('')}</div></div>
+    </div></div>`;
+}
+
+function settingsPanel(){
+  return `<div class="h2">Настройки приложения</div>
+   <div class="card"><div class="card-h">Общие</div><div class="card-b">
+     <div class="field"><label class="lbl">Язык интерфейса</label>
+       <select class="sel"><option>Русский</option><option>English</option><option>Беларуская</option></select></div>
+     <div class="g2"><div><label class="lbl">Масштаб чертежа</label><select class="sel">${['1:1','1:10','1:20','1:50','1:100','1:200','1:500','1:1000','1:2000'].map(s=>`<option ${s=='1:100'?'selected':''}>${s}</option>`).join('')}</select></div>
+     <div><label class="lbl">Единицы чертежа</label><select class="sel"><option>Миллиметры</option><option>Метры</option></select></div></div>
+     <div class="hint">Высоты МП задаются в метрах и пересчитываются в единицы чертежа по масштабу.</div>
+   </div></div>
+   <div class="card"><div class="card-h">База данных молниеприёмников</div><div class="card-b">
+     <label class="lbl">Файл базы данных</label>
+     <div class="row"><input class="inp" value="${S.dbOk?'D:\\Projects\\LP\\rods_catalog.json':'D:\\Projects\\LP\\old\\rods.json'}"><button class="btn">${icon('folder')}Обзор…</button></div>
+     ${S.dbOk?`<div class="hint" style="color:var(--ok)">● Подключено · 24 записи · изменён 12.11.2026</div>`:`<div class="info err">✕ Файл не найден. Каталог молниеприёмников недоступен.</div>`}
+     <div class="row" style="margin-top:8px"><button class="btn">${icon('add')}Создать новый</button><button class="btn" ${S.dbOk?'':'disabled'}>Перечитать</button></div>
+     <div class="hint">Поддерживаемые форматы: .json, .xml, .sqlite</div>
+   </div></div>
+   <div class="card"><div class="card-h">Построение</div><div class="card-b">
+     <div class="g2 field"><div><label class="lbl">Слой зон</label><input class="inp" value="LP_ZONES"></div>
+     <div><label class="lbl">Слой молниеприёмников</label><input class="inp" value="LP_RODS"></div></div>
+     <label class="chk"><input type="checkbox" checked>Подписывать радиусы зон</label>
+   </div></div>`;
+}
+
+function footer(){
+  if(S.view=='settings') return `<div class="actions"><button class="btn">Сбросить по умолчанию</button><span style="flex:1"></span><button class="btn" onclick="setView('so153')">Отмена</button><button class="btn pri">Применить</button></div>`;
+  if(S.view=='rods') return `<div class="actions"><button class="btn dng" onclick="openM('clear')">${icon('del')}Очистить зоны</button></div>`;
+  return `<div class="actions"><button class="btn dng" onclick="openM('clear')">${icon('del')}Очистить зоны</button><span style="flex:1"></span>
+    <button class="btn pri" style="min-width:160px;justify-content:center">${icon('zone')}Построить зону</button></div>`;
+}
+
+function dlg(title,body,foot,cls=''){
+  return `<div class="dlg ${cls}"><div class="title"><div class="ic">${icon('zone')}</div><div class="t">${title}</div><div class="cap close" onclick="closeM()">&#10005;</div></div>
+   <div class="db">${body}</div><div class="df">${foot}</div></div>`;
+}
+function modalHtml(){
+  if(S.modal=='add'||S.modal=='edit'){
+    const e=S.modal=='edit', r=e?rods[S.selRow]:{id:'МП-7',name:'',type:'Стержневой',h:'',x:'',y:'',on:true};
+    return dlg(e?`Изменить молниеприёмник — ${r.id}`:'Добавить молниеприёмник',`
+      <div class="field" style="display:grid;grid-template-columns:110px 1fr;gap:8px"><div><label class="lbl">Обозначение</label><input class="inp" value="${r.id}"></div>
+      <div><label class="lbl">Наименование</label><input class="inp" value="${r.name}" placeholder="Например: Мачта ММ-30"></div></div>
+      <div class="field"><label class="lbl">Тип</label><select class="sel">${['Стержневой','Мачта','Опора троса','Прожекторная мачта'].map(t=>`<option ${t==r.type?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="g2 field"><div><label class="lbl">Высота h</label><div class="unit"><input class="inp" value="${r.h}" placeholder="0.0"><i>м</i></div></div>
+      <div><label class="lbl">Отметка основания</label><div class="unit"><input class="inp" value="0.00"><i>м</i></div></div></div>
+      <label class="lbl">Положение на чертеже</label>
+      <div class="row ${e?'':'field'}"><div class="unit" style="flex:1"><input class="inp" value="${r.x}" placeholder="X" ${e?'disabled':''}><i>X</i></div><div class="unit" style="flex:1"><input class="inp" value="${r.y}" placeholder="Y" ${e?'disabled':''}><i>Y</i></div>
+      <button class="btn" ${e?'disabled':''}>${icon('pick')}Указать</button></div>
+      ${e?'<div class="hint field" style="margin-top:4px">🔒 В режиме редактирования положение изменить нельзя — доступны только свойства молниеприёмника.</div>':''}
+      <div class="field"><label class="lbl">Описание</label><textarea class="inp" rows="2" style="height:auto;padding:5px 8px;resize:vertical" placeholder="Например: на кровле корпуса 2, отм. +12.000">${e?'Отдельно стоящий, у восточного фасада корпуса 1':''}</textarea></div>
+      <label class="chk ${e?'':'dis'}"><input type="checkbox" ${r.on?'checked':''} ${e?'':'disabled'}>Активен (участвует в расчётах)</label>
+      ${e?'':'<div class="hint" style="margin:-2px 0 6px 20px">Новый молниеприёмник всегда добавляется активным.</div>'}
+      <label class="chk ${S.dbOk?'':'dis'}"><input type="checkbox" ${S.dbOk?'':'disabled'}>Сохранить в базу данных как шаблон</label>
+      ${e?`<div class="info blue">ⓘ Зоны с участием ${r.id} будут перестроены после сохранения.</div>`:''}`,
+     `<button class="btn" onclick="closeM()">Отмена</button><button class="btn pri" onclick="closeM()">${e?'Сохранить':'Добавить'}</button>`);
+  }
+  if(S.modal=='del'){
+    const r=rods[S.selRow];
+    return dlg('Удаление молниеприёмника',`<div style="font-size:13px;margin-bottom:8px">Удалить молниеприёмник <b>${r.id}</b> (${r.type}, h=${r.h} м) с чертежа?</div>
+      <div class="info">⚠ Зоны молниезащиты, построенные с участием ${r.id}, будут удалены.</div>`,
+     `<button class="btn" onclick="closeM()">Отмена</button><button class="btn pri" style="background:var(--danger);border-color:var(--danger)" onclick="closeM()">${icon('del')}Удалить</button>`);
+  }
+  if(S.modal=='cat'){
+    return dlg('Каталог молниеприёмников',`
+      <div class="row field"><div class="unit" style="flex:1"><input class="inp" placeholder="Поиск по названию…"><i>${icon('search')}</i></div>
+      <select class="sel" style="width:130px"><option>Все типы</option><option>Стержневой</option><option>Мачта</option><option>Опора троса</option></select></div>
+      <div class="card catlist" style="max-height:260px;overflow:auto">${catalog.map((c,i)=>`<div class="it ${S.cat==i?'cur':''}" onclick="S.cat=${i};render()">
+        <div class="thumb">${icon(c[1]=='Опора троса'?'frame':'zone')}</div><div><b>${c[0]}</b><span>${c[1]} · ${c[3]}</span></div><div style="font-weight:600">${c[2]} м</div></div>`).join('')}</div>
+      <div class="g2"><div><label class="lbl">Наименование</label><input class="inp" value="${catalog[S.cat][0]}"></div>
+      <div><label class="lbl">Количество вставок</label><input class="inp" type="number" value="1"></div></div>
+      <div class="hint">Обозначение (МП-7, МП-8 …) присваивается автоматически при вставке на чертёж. Источник: rods_catalog.json · 24 записи</div>`,
+     `<button class="btn" onclick="closeM()">Отмена</button><button class="btn pri" onclick="closeM()">${icon('pick')}Вставить на чертёж</button>`,'wide');
+  }
+  if(S.modal=='clear'){
+    const o=[['Все зоны','Удалить все построенные зоны молниезащиты на чертеже (3 шт.)'],
+             ['Выбранные зоны','После нажатия «Очистить» укажите зоны на чертеже']];
+    return dlg('Очистка зон молниезащиты',`
+      ${o.map((x,i)=>`<label class="opt ${S.clr==i?'on':''}" onclick="S.clr=${i};render()"><input type="radio" name="c" ${S.clr==i?'checked':''}><div><b>${x[0]}</b><span>${x[1]}</span></div></label>`).join('')}
+      <div class="info blue">ⓘ Молниеприёмники не удаляются. Действие можно отменить командой ОТМЕНИТЬ (U).</div>`,
+     `<button class="btn" onclick="closeM()">Отмена</button><button class="btn pri" style="background:var(--danger);border-color:var(--danger)" onclick="closeM()">${icon('del')}Очистить</button>`);
+  }
+  return '';
+}
+
+function drawRods(){
+  $('rodsvg').innerHTML=rods.map(r=>{const [x,y]=r.p,c=!r.on?'#6b737c':r.type=='Опора троса'?'#ff8c4d':'#ffd34d';
+    const m=r.type=='Опора троса'?`<rect x="${x-6}" y="${y-6}" width="12" height="12" fill="none" stroke="${c}" stroke-width="2"/>`:`<circle cx="${x}" cy="${y}" r="7" fill="none" stroke="${c}" stroke-width="2"/><path d="M${x-7} ${y}h14M${x} ${y-7}v14" stroke="${c}"/>`;
+    return m+`<text x="${x+12}" y="${y-9}" fill="${c}">${r.id}${r.on?' h='+r.h:' (откл.)'}</text>`}).join('')+
+    `<path d="M616 161 L874 221" stroke="#ff8c4d" stroke-width="1.5"/>`;
+  const hl=$('hl');
+  if(S.zoom!=null){const [x,y]=rods[S.zoom].p;hl.setAttribute('cx',x);hl.setAttribute('cy',y);hl.setAttribute('opacity',1)} else hl.setAttribute('opacity',0);
+}
+function render(){
+  $('side').innerHTML=sidebar();
+  $('body').innerHTML=S.view=='settings'?settingsPanel():S.view=='rods'?commonBlock():methodPanel();
+  $('foot').innerHTML=footer();
+  $('status').innerHTML=`<span><span class="dot" style="${S.dbOk?'':'background:var(--danger)'}"></span>${S.dbOk?'БД: rods_catalog.json':'БД не подключена'}</span><span>Масштаб 1:100</span><span>RU</span><span style="margin-left:auto">Зон на чертеже: 3</span>`;
+  const o=$('ovl');o.innerHTML=modalHtml();o.classList.toggle('on',!!S.modal);
+  drawRods();
+  const cmd={rods:'Выберите молниеприёмник',single:'Выберите молниеприёмник или нажмите ⌖',double:'Укажите первый молниеприёмник:',cable:'Укажите опору подвеса троса A:',multi:'Выберите объекты рамкой (неактивные МП отфильтрованы):'};
+  $('cmdline').textContent='Команда: LPZONE  · '+(S.zoom!=null?`_ZOOM _OBJECT → ${rods[S.zoom].id}`:S.modal=='cat'?'Укажите точку вставки:':S.modal=='clear'?'Очистка зон…':S.view=='settings'?'Настройки':S.view=='rods'?cmd.rods:cmd[S.model]);
+}
+function setView(v){S.view=v;if(norms[v])S.rel=Math.min(S.rel,norms[v].rel.length-1);render()}
+function openM(m){S.modal=m;render()}
+function closeM(){S.modal=null;render()}
+function toggleRod(){rods[S.selRow].on=!rods[S.selRow].on;render()}
+function zoomTo(i){S.selRow=i;S.zoom=i;render()}
+function tgMulti(id){S.multi.includes(id)?S.multi=S.multi.filter(x=>x!=id):S.multi.push(id);render()}
+function go(i){
+  rods.forEach((r,j)=>r.on=j!=2);
+  S={...base,...screens[i].set};
+  document.querySelectorAll('#navlist button').forEach((b,j)=>b.classList.toggle('on',i==j));
+  $('ann').innerHTML=`<h3>${i+1}. ${screens[i].n}</h3><ul>${screens[i].ann.map(a=>`<li>${a}</li>`).join('')}</ul>`;
+  render();
+}
+$('navlist').innerHTML=screens.map((s,i)=>`<button onclick="go(${i})"><b>${i+1}. ${s.n}</b><span>${s.d}</span></button>`).join('');
+go(0);
+</script>
+</body>
+</html>
