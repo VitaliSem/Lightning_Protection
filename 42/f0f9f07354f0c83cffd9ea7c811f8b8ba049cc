@@ -1,0 +1,15 @@
+design/lightning_protection_ui.html
+  h_aad0f873e1dc77 1-432,434-504
+  h_aad0f873e1dc77 433
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "42f0f9f07354f0c83cffd9ea7c811f8b8ba049cc",
+  "prompts": {},
+  "humans": {
+    "h_aad0f873e1dc77": {
+      "author": "Vitali.Siamashka <vitali.siamashka@ventionteams.com>"
+    }
+  }
+}
