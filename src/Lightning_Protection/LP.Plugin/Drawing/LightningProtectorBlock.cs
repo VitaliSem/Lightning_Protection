@@ -1,5 +1,6 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using LP.Core.Constants;
 using LP.Core.Services;
 using LP.Plugin.Acad;
 using LP.Plugin.Models;
@@ -43,21 +44,21 @@ public static class LightningProtectorBlock
             new Line(new Point3d(-d, d, 0), new Point3d(d, -d, 0)),
 
             NewAttribute(db, 1, new AttributeDefinitionDto
-                { Tag = LightningProtectorBlockService.AttrNumber, Prompt = "Number", Invisible = true }),
+                { Tag = LightningProtectorAttributes.Number, Prompt = "Number", Invisible = true }),
             NewAttribute(db, 0, new AttributeDefinitionDto
-                { Tag = LightningProtectorBlockService.AttrName, Prompt = "Name", LockPosition = false }),
+                { Tag = LightningProtectorAttributes.Name, Prompt = "Name", LockPosition = false }),
             NewAttribute(db, -1, new AttributeDefinitionDto
-                { Tag = LightningProtectorBlockService.AttrHeightM, Prompt = "Height, m", LockPosition = false }),
+                { Tag = LightningProtectorAttributes.HeightM, Prompt = "Height, m", LockPosition = false }),
             NewAttribute(db, -2, new AttributeDefinitionDto
-                { Tag = LightningProtectorBlockService.AttrBaseHeightM, Prompt = "Base height, m", LockPosition = false }),
+                { Tag = LightningProtectorAttributes.BaseHeightM, Prompt = "Base height, m", LockPosition = false }),
             NewAttribute(db, -3, new AttributeDefinitionDto
-                { Tag = LightningProtectorBlockService.AttrTitle, Prompt = "Title", Invisible = true }),
+                { Tag = LightningProtectorAttributes.Title, Prompt = "Title", Invisible = true }),
             NewAttribute(db, -4, new AttributeDefinitionDto
-                { Tag = LightningProtectorBlockService.AttrType, Prompt = "Type", Invisible = true }),
+                { Tag = LightningProtectorAttributes.Type, Prompt = "Type", Invisible = true }),
             NewAttribute(db, -5, new AttributeDefinitionDto
-                { Tag = LightningProtectorBlockService.AttrDescription, Prompt = "Description", Invisible = true }),
+                { Tag = LightningProtectorAttributes.Description, Prompt = "Description", Invisible = true }),
             NewAttribute(db, -6, new AttributeDefinitionDto
-                { Tag = LightningProtectorBlockService.AttrIsActive, Prompt = "Is active", Invisible = true, DefaultValue = "true" }),
+                { Tag = LightningProtectorAttributes.IsActive, Prompt = "Is active", Invisible = true, DefaultValue = "true" }),
         ];
 
         foreach (Entity e in geometry)

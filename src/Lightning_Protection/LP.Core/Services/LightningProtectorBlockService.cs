@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using LP.Core.Constants;
+using LP.Core.Helpers;
 using LP.Core.Models.Base;
 using LP.Core.Models.LightningProtectors.Block;
 
@@ -14,24 +16,12 @@ namespace LP.Core.Services
         public const string BlockName = "B_LP_Lightning_Protector";
         public const string LayerName = "L_LP_Lightning_Protectors";
 
-        public const string AttrNumber = "NUMBER";
-        public const string AttrName = "NAME";
-        public const string AttrTitle = "TITLE";
-        public const string AttrType = "TYPE";
-        public const string AttrHeightM = "HEIGHT_M";
-        public const string AttrBaseHeightM = "BASE_HEIGHT_M";
-        public const string AttrDescription = "DESCRIPTION";
-        public const string AttrIsActive = "IS_ACTIVE";
-
         public const double MaxProtectorHeight = 150;
 
         public const int MaxNameLength = 100;
         public const int MaxTitleLength = 100;
         public const int MaxTypeLength = 100;
         public const int MaxDescriptionLength = 500;
-
-        public const string HeightPrefix = "h=";
-        public const string BaseHeightPrefix = "h0=";
 
         /// <summary>
         /// Returns an error message when the trimmed text is longer than maxLength characters, otherwise null.
@@ -57,10 +47,7 @@ namespace LP.Core.Services
 
             foreach (string value in existingNumbers)
             {
-                if (string.IsNullOrWhiteSpace(value))
-                    continue;
-
-                if (int.TryParse(value.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var number) && number > max)
+                if (AttributeValueHelper.TryParseNumber(value, out var number) && number > max)
                     max = number;
             }
 
@@ -75,42 +62,142 @@ namespace LP.Core.Services
                 if (dto == null)
                     return OperationResult<LightningProtectorBlockData>.Fail("Protector data cannot be null.");
 
-                double heightM = dto.HeightM;
-                double? baseHeightM = dto.BaseHeightM;
-
-                if (heightM <= 0)
-                    return OperationResult<LightningProtectorBlockData>.Fail("Protector height must be greater than zero.");
-
-                if (heightM > MaxProtectorHeight)
-                    return OperationResult<LightningProtectorBlockData>.Fail("Protector height exceeds maximum supported value of 150 m.");
-
-                if (baseHeightM.HasValue && (double.IsNaN(baseHeightM.Value) || double.IsInfinity(baseHeightM.Value)))
-                    return OperationResult<LightningProtectorBlockData>.Fail("Base height must be a finite number.");
-
-                string error = ValidateTextLength(dto.Name, MaxNameLength, "Name")
-                    ?? ValidateTextLength(dto.Title, MaxTitleLength, "Title")
-                    ?? ValidateTextLength(dto.Type, MaxTypeLength, "Type")
-                    ?? ValidateTextLength(dto.Description, MaxDescriptionLength, "Description");
-
-                if (error != null)
-                    return OperationResult<LightningProtectorBlockData>.Fail(error);
-
                 var data = new LightningProtectorBlockData(
                     GetNextNumber(dto.ExistingNumbers),
-                    (dto.Name ?? string.Empty).Trim(),
-                    (dto.Type ?? string.Empty).Trim(),
-                    heightM,
+                    AttributeValueHelper.Clean(dto.Name),
+                    AttributeValueHelper.Clean(dto.Type),
+                    dto.HeightM,
                     true,
-                    baseHeightM,
-                    (dto.Description ?? string.Empty).Trim(),
-                    (dto.Title ?? string.Empty).Trim());
+                    dto.BaseHeightM,
+                    AttributeValueHelper.Clean(dto.Description),
+                    AttributeValueHelper.Clean(dto.Title));
 
-                return OperationResult<LightningProtectorBlockData>.Ok(data);
+                string error = Validate(data);
+
+                return error == null
+                    ? OperationResult<LightningProtectorBlockData>.Ok(data)
+                    : OperationResult<LightningProtectorBlockData>.Fail(error);
             }
             catch (Exception ex)
             {
                 return OperationResult<LightningProtectorBlockData>.Fail("An unexpected error occurred while creating the protector data.", ex);
             }
+        }
+
+        /// <summary>Validates the new values and builds the data of an existing lightning protector block, keeping its number.</summary>
+        public static OperationResult<LightningProtectorBlockData> Update(LightningProtectorBlockData current, LightningProtectorBlockUpdateDto dto)
+        {
+            try
+            {
+                if (current == null)
+                    return OperationResult<LightningProtectorBlockData>.Fail("Current protector data cannot be null.");
+
+                if (dto == null)
+                    return OperationResult<LightningProtectorBlockData>.Fail("Protector data cannot be null.");
+
+                var data = new LightningProtectorBlockData(
+                    current.Number,
+                    AttributeValueHelper.Clean(dto.Name),
+                    AttributeValueHelper.Clean(dto.Type),
+                    dto.HeightM,
+                    dto.IsActive,
+                    dto.BaseHeightM,
+                    AttributeValueHelper.Clean(dto.Description),
+                    AttributeValueHelper.Clean(dto.Title));
+
+                string error = Validate(data);
+
+                return error == null
+                    ? OperationResult<LightningProtectorBlockData>.Ok(data)
+                    : OperationResult<LightningProtectorBlockData>.Fail(error);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult<LightningProtectorBlockData>.Fail("An unexpected error occurred while updating the protector data.", ex);
+            }
+        }
+
+        /// <summary>Restores the protector data from the attribute values of a block reference.</summary>
+        public static OperationResult<LightningProtectorBlockData> FromAttributeValues(IDictionary<string, string> values)
+        {
+            try
+            {
+                if (values == null)
+                    return OperationResult<LightningProtectorBlockData>.Fail("Attribute values cannot be null.");
+
+                var lookup = new Dictionary<string, string>(values, StringComparer.OrdinalIgnoreCase);
+
+                if (!AttributeValueHelper.TryParseNumber(AttributeValueHelper.GetValue(lookup, LightningProtectorAttributes.Number), out int number))
+                    return OperationResult<LightningProtectorBlockData>.Fail("The protector number attribute is missing or invalid.");
+
+                if (!TryParseMeters(AttributeValueHelper.GetValue(lookup, LightningProtectorAttributes.HeightM), LightningProtectorAttributes.HeightPrefix, out double? heightM) || !heightM.HasValue)
+                    return OperationResult<LightningProtectorBlockData>.Fail(
+                        string.Format(CultureInfo.InvariantCulture, "The height attribute of protector #{0} is missing or invalid.", number));
+
+                if (!TryParseMeters(AttributeValueHelper.GetValue(lookup, LightningProtectorAttributes.BaseHeightM), LightningProtectorAttributes.BaseHeightPrefix, out double? baseHeightM))
+                    return OperationResult<LightningProtectorBlockData>.Fail(
+                        string.Format(CultureInfo.InvariantCulture, "The base height attribute of protector #{0} is invalid.", number));
+
+                bool isActive = !string.Equals(AttributeValueHelper.GetValue(lookup, LightningProtectorAttributes.IsActive).Trim(), "false", StringComparison.OrdinalIgnoreCase);
+
+                var data = new LightningProtectorBlockData(
+                    number,
+                    AttributeValueHelper.GetValue(lookup, LightningProtectorAttributes.Name),
+                    AttributeValueHelper.GetValue(lookup, LightningProtectorAttributes.Type),
+                    heightM.Value,
+                    isActive,
+                    baseHeightM,
+                    AttributeValueHelper.GetValue(lookup, LightningProtectorAttributes.Description),
+                    AttributeValueHelper.GetValue(lookup, LightningProtectorAttributes.Title));
+
+                return OperationResult<LightningProtectorBlockData>.Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult<LightningProtectorBlockData>.Fail("An unexpected error occurred while reading the protector data.", ex);
+            }
+        }
+
+        private static string Validate(LightningProtectorBlockData data)
+        {
+            if (data.HeightM <= 0)
+                return "Protector height must be greater than zero.";
+
+            if (data.HeightM > MaxProtectorHeight)
+                return "Protector height exceeds maximum supported value of 150 m.";
+
+            if (data.BaseHeightM.HasValue && (double.IsNaN(data.BaseHeightM.Value) || double.IsInfinity(data.BaseHeightM.Value)))
+                return "Base height must be a finite number.";
+
+            return ValidateTextLength(data.Name, MaxNameLength, "Name")
+                ?? ValidateTextLength(data.Title, MaxTitleLength, "Title")
+                ?? ValidateTextLength(data.Type, MaxTypeLength, "Type")
+                ?? ValidateTextLength(data.Description, MaxDescriptionLength, "Description");
+        }
+
+        /// <summary>
+        /// Parses a meter value written with an optional prefix; a blank text yields no value.
+        /// Returns false when the text is not a finite number.
+        /// </summary>
+        private static bool TryParseMeters(string text, string prefix, out double? value)
+        {
+            value = null;
+
+            string trimmed = (text ?? string.Empty).Trim();
+
+            if (trimmed.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                trimmed = trimmed.Substring(prefix.Length).Trim();
+
+            if (trimmed.Length == 0)
+                return true;
+
+            if (!double.TryParse(trimmed, NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed)
+                || double.IsNaN(parsed) || double.IsInfinity(parsed))
+                return false;
+
+            value = parsed;
+
+            return true;
         }
 
         /// <summary>Attribute values of the block reference, keyed by attribute tag.</summary>
@@ -121,16 +208,16 @@ namespace LP.Core.Services
 
             return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                { AttrNumber, data.Number.ToString(CultureInfo.InvariantCulture) },
-                { AttrName, data.Name ?? string.Empty },
-                { AttrTitle, data.Title ?? string.Empty },
-                { AttrType, data.Type ?? string.Empty },
-                { AttrHeightM, HeightPrefix + data.HeightM.ToString("0.##", CultureInfo.InvariantCulture) },
-                { AttrBaseHeightM, data.BaseHeightM.HasValue
-                    ? BaseHeightPrefix + data.BaseHeightM.Value.ToString("0.##", CultureInfo.InvariantCulture)
+                { LightningProtectorAttributes.Number, data.Number.ToString(CultureInfo.InvariantCulture) },
+                { LightningProtectorAttributes.Name, data.Name ?? string.Empty },
+                { LightningProtectorAttributes.Title, data.Title ?? string.Empty },
+                { LightningProtectorAttributes.Type, data.Type ?? string.Empty },
+                { LightningProtectorAttributes.HeightM, LightningProtectorAttributes.HeightPrefix + data.HeightM.ToString("0.##", CultureInfo.InvariantCulture) },
+                { LightningProtectorAttributes.BaseHeightM, data.BaseHeightM.HasValue
+                    ? LightningProtectorAttributes.BaseHeightPrefix + data.BaseHeightM.Value.ToString("0.##", CultureInfo.InvariantCulture)
                     : string.Empty },
-                { AttrDescription, data.Description ?? string.Empty },
-                { AttrIsActive, data.IsActive ? "true" : "false" }
+                { LightningProtectorAttributes.Description, data.Description ?? string.Empty },
+                { LightningProtectorAttributes.IsActive, data.IsActive ? "true" : "false" }
             };
         }
     }
