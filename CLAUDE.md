@@ -54,72 +54,25 @@ AutoCAD extension for calculating and visualizing lightning protection areas acc
 
 - **LP.Core** (`netstandard2.0`) — Core domain logic with zero external dependencies. Contains models, calculation services, and abstraction interfaces for AutoCAD integration. Never references AutoCAD.
 - **LP.Core.Tests** (`net8.0`, xUnit, `Xunit` as a global using) — Unit tests for LP.Core calculation services.
-- **LP.Plugin** (SDK-style, multi-target `net8.0;net48`) — the single AutoCAD plugin project:
-  - `net48` → `AutoCAD.NET` NuGet package **24.3.0** (AutoCAD 2024)
-  - `net8.0` → `AutoCAD.NET.Core` NuGet package **25.0.0** (AutoCAD 2025+)
-  - both with `ExcludeAssets=runtime` (AutoCAD supplies the DLLs at load time)
-  - `LangVersion 12`, `ImplicitUsings` and `Nullable` enabled
+- **LP.Plugin** (SDK-style, multi-target `net8.0;net48`) — the single AutoCAD plugin project: `net48` for AutoCAD 2024, `net8.0` for AutoCAD 2025+ (packages and compatibility rules in `LP.Plugin/AGENTS.md`).
 - **LP.UI** (`.NET Framework 4.8`, legacy non-SDK csproj) — UI library, currently only `AssemblyInfo`. Targets net48 only, so the `net8.0` build of LP.Plugin cannot reference it as-is.
 
 The `packages/AutoCAD.NET.*.24.0.0/` folder is a gitignored leftover of the former `packages.config` setup; LP.Plugin restores AutoCAD packages from NuGet via `PackageReference`.
 
-### Domain Models
+### Project-specific guidance
 
-Base models in `LP.Core/Models/Base/` (namespace `LP.Core.Models.Base`):
-- `Point3D` (X, Y, Z coordinates)
-- `Polyline3D` (list of Point3D with IsClosed flag)
-- `ProtectionPoint` (Point3D + optional Radius + IsLastPoint flag)
-- `ProtectionArea` (list of ProtectionPoint)
-- `OperationResult<T>` — generic result wrapper with IsSuccess/Message/Exception (`Ok(...)` / `Fail(message, exception)`)
+Each project keeps its own knowledge in an `AGENTS.md` next to its csproj. **Read the relevant file before working in that project:**
 
-Protector models in `LP.Core/Models/LightningProtectors/<Type>/` (namespace `LP.Core.Models.LightningProtectors.<Type>`):
-- `SingleRod/SingleRodLightningProtector` — one position + height
-- `SingleRod/SingleRodProtectionArea` — center point + radius at height hx
-- `SingleWire/SingleWireLightningProtector` — two pin points with heights
-- `SingleWire/SingleWireProtectionArea` — two pin points with radii
-- `DoubleRod/DoubleRodLightningProtector` — two SingleRodLightningProtectors (composite)
-- `DoubleRod/DoubleRodProtectionArea` — both rod areas + zone parameters (h0, r0, L, Lmax, Lc, hc, IsCombined, rx, lx, rcx, lx1, lx2)
-- `DoubleWire/DoubleWireLightningProtector` — two SingleWireLightningProtectors (composite)
+- [`src/Lightning_Protection/LP.Core/AGENTS.md`](src/Lightning_Protection/LP.Core/AGENTS.md) — C# 7.3 / netstandard2.0 rules, domain models, `ProtectionArea` convention, SN 4.04.03 calculation pipeline, services, `Constants/` and `Helpers/`, interfaces.
+- [`src/Lightning_Protection/LP.Plugin/AGENTS.md`](src/Lightning_Protection/LP.Plugin/AGENTS.md) — net48/net8.0 compatibility rules, folder layout, DTO rule, lightning protector commands and `LightningProtectorFinder`, `autocad-api` skill.
 
-`ProtectionArea` convention: `Radius == null` → straight segment starts at the point; `Radius` set → arc of that radius starts at the point; `IsLastPoint == true` closes the outline; a single point with a radius is a circle. The double-rod non-combined result is two points with radii = two separate circles (point = centre).
+### AutoCAD bridge
 
-### Calculation Pipeline (SN 4.04.03)
-
-All calculation services follow the same pattern:
-
-1. Service exposes a static `Calculate()` method that returns `OperationResult<T>`; bodies are wrapped in try/catch and exceptions are converted to `Fail` — keep this convention
-2. Protected cone model: cone height `h0`, base radius `r0`, protection radius at height hx: `rx = r0 * (h0 - hx) / h0`
-3. Three lightning protection reliability levels: 0.900, 0.990, 0.999 (`LightningProtectionReliability.P0_900 / P0_990 / P0_999`)
-4. Height-dependent coefficients for three ranges: 0-30m, 30-100m, 100-150m (max 150m). The coefficients come directly from the standard's tables — change them only against the standard
-5. Validation: protector height `> 0` and `<= 150` m; `hx >= 0` and `hx < h` (for double rod: less than both heights)
-
-Service implementations (`LP.Core/Services/SN_4_04_03/`):
-- `SingleRodProtectionService` — Table 10.1: single rod (fully implemented). `CalculateConeHeight` / `CalculateConeBaseRadius` are reused by the double-rod service.
-- `SingleWireProtectionService` — Table 10.2: single wire (fully implemented). Also has `GetProtectionArea()` that computes external tangent lines between two circles.
-- `DoubleRodProtectionService` — double rod (implemented). `Calculate()` derives averaged `h0`/`r0`, `Lmax`, `Lc`, `hc` and decides combined vs separate zones; `GetProtectionArea()` returns two circles (L > Lmax) or a 6-point closed outline (separate `hx >= hc` and `hx < hc` builders).
-- `LightningProtectionService` — orchestrator implementing `ILightningProtectionService`. Wraps the static services; the double wire method throws `NotImplementedException`.
-- `GeometryService` (`LP.Core/Services/`) — static 2D helpers: Get2DDistance, GetAngleToHorizontal, GetTangentDeviationAngle (Z is ignored).
-
-### Key Interfaces (`LP.Core/Interfaces/`)
-
-- `ILightningProtectionService` — main service contract (single rod, single wire, double rod, double wire)
-- `IAcadDocument` — document abstraction (Name, ExecuteInTransaction, GetModelSpace, Regen)
-- `IAcadTransaction` — transaction abstraction (GetObject, AddEntity, IDisposable)
-
-### AutoCAD Integration
-
-- `LP.Plugin` references LP.Core. Layout: `Acad/` (API helpers adapted from the `autocad-api` skill: `BlockHelper` (definitions, inserts, references), `BlockAttributeHelper` (attribute definitions and references), `LayerHelper`, `ScaleHelper`, `PromptHelper` (reusable `TryGet...` editor prompts for commands)), `Drawing/` (block definitions, ProtectionArea → AutoCAD entities), `Commands/` (`[CommandMethod]` classes, each with a `<Name>Prompts` class holding its prompt texts and prompt DTOs), `Models/` (DTOs: `LayerDto`, `BlockDefinitionDto`, `AttributeDefinitionDto`, `BlockInsertDto`, `TextPromptDto`, `NumberPromptDto`). Methods that would take more than 3 parameters take a DTO instead. `Constants/` holds names that must not be hard-coded elsewhere: `AcadConstants` (AutoCAD key names such as object context collections) and `CommandNames` (names of `[CommandMethod]` commands).
-- `lightning_protector_insert` (`Commands/LightningProtectorCommands`) inserts the annotative block `B_LP_Lightning_Protector` (layer `L_LP_Lightning_Protectors`, created on demand by `Drawing/LightningProtectorBlock`). Names, attribute tags, numbering and height validation live in `LP.Core/Services/LightningProtectorBlockService`.
-- The AutoCAD abstractions in `LP.Core` (`IAcadDocument`, `IAcadTransaction`) are the bridge between calculation logic and the AutoCAD API; LP.Plugin supplies the concrete implementations.
-- Code in LP.Plugin must compile for both targets:
-  - use `Autodesk.AutoCAD.ApplicationServices.Core.Application` (AcCoreMgd) — the full `ApplicationServices.Application` lives in AcMgd, which the `net8.0` target does not reference;
-  - C# 12 syntax is fine, but avoid runtime-dependent features missing in net48 (records/`init`, `required`, `Index`/`Range`, default interface members) and BCL APIs absent in net48 (`Math.Clamp`, `ArgumentNullException.ThrowIfNull`, `string.Contains(char)`, `[NotNullWhen]` and other nullable attributes);
-  - use `#if NET8_0_OR_GREATER` for version-specific code.
-- AutoCAD API patterns (transactions, layers, polylines with bulges, text, blocks/attributes, annotative scales) and ready-made helpers are in the `autocad-api` skill: `.claude/skills/autocad-api/SKILL.md`.
+The AutoCAD abstractions in `LP.Core` (`IAcadDocument`, `IAcadTransaction`) are the bridge between calculation logic and the AutoCAD API; LP.Plugin supplies the concrete implementations. LP.Core never references AutoCAD; LP.Plugin references LP.Core.
 
 ### Conventions
 
-- `netstandard2.0` LP.Core means **no nullable reference types and no implicit usings** there — write explicit `using` directives and C# 7.3-compatible code in LP.Core. LP.Core.Tests and LP.Plugin use implicit usings and nullable.
+- LP.Core is C# 7.3 without nullable or implicit usings; LP.Core.Tests and LP.Plugin use implicit usings and nullable (details in each project's `AGENTS.md`).
 - Callers check `OperationResult.IsSuccess` and propagate `Message` / `Exception`; don't throw across project boundaries.
 - `/// <summary>` comments on methods:
   - add one only when the method has complex logic. Leave out summaries on simple or self-explanatory methods (getters, thin wrappers, one-line lookups);
@@ -132,4 +85,4 @@ Service implementations (`LP.Core/Services/SN_4_04_03/`):
 - Single wire protection area — **complete** (Table 10.2, including tangent-line geometry)
 - Double rod protection area — **implemented** (`DoubleRodProtectionService`, with tests); geometry of the combined outline still to be verified against the standard
 - Double wire protection area — **not implemented** (throws `NotImplementedException`)
-- AutoCAD plugin (`LP.Plugin`) — **in progress**: `lightning_protector_insert` implemented; protection-area drawing commands not yet
+- AutoCAD plugin (`LP.Plugin`) — **in progress**: `lightning_protector_insert` and `lightning_protector_edit` implemented; protection-area drawing commands not yet

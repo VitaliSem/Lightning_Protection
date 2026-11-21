@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using LP.Core.Constants;
 using LP.Core.Models.Base;
 using LP.Core.Models.LightningProtectors.Block;
 using LP.Core.Services;
@@ -48,7 +49,7 @@ public class LightningProtectorCommands
             OperationResult<LightningProtectorBlockData> result = LightningProtectorBlockService.Create(
                 new LightningProtectorBlockCreateDto
                 {
-                    ExistingNumbers = GetExistingNumbers(tr, db),
+                    ExistingNumbers = LightningProtectorFinder.GetExistingNumbers(tr, db),
                     Name = name,
                     Title = title,
                     Type = type,
@@ -86,19 +87,96 @@ public class LightningProtectorCommands
         }
     }
 
-    private static List<string> GetExistingNumbers(Transaction tr, Database db)
+    [CommandMethod(CommandNames.LightningProtectorEdit)]
+    public void EditLightningProtector()
     {
-        var numbers = new List<string>();
+        Document? doc = AcApp.DocumentManager.MdiActiveDocument;
 
-        foreach (ObjectId refId in BlockHelper.FindBlockReferences(tr, db, LightningProtectorBlockService.BlockName))
+        if (doc is null)
+            return;
+
+        Database db = doc.Database;
+        Editor ed = doc.Editor;
+
+        try
         {
-            var br = (BlockReference)tr.GetObject(refId, OpenMode.ForRead);
+            if (!PromptHelper.TryGetPositiveInt(ed, LightningProtectorPrompts.Number, out int number)) return;
 
-            if (BlockAttributeHelper.GetAttributeValues(tr, br)
-                .TryGetValue(LightningProtectorBlockService.AttrNumber, out string? number))
-                numbers.Add(number);
+            OperationResult<LightningProtectorReferenceDto> found;
+
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                found = LightningProtectorFinder.FindByNumber(tr, db, number);
+                tr.Commit();
+            }
+
+            if (!found.IsSuccess)
+            {
+                ed.WriteMessage("\n" + found.Message);
+                return;
+            }
+
+            ObjectId refId = found.Result.Id;
+
+            OperationResult<LightningProtectorBlockData> current =
+                LightningProtectorBlockService.FromAttributeValues(found.Result.AttributeValues);
+
+            if (!current.IsSuccess)
+            {
+                ed.WriteMessage("\n" + current.Message);
+                return;
+            }
+
+            LightningProtectorBlockData data = current.Result;
+            bool isActive = data.IsActive;
+
+            if (!PromptHelper.TryGetString(ed, LightningProtectorPrompts.EditName(data.Name), out string name)) return;
+            if (!PromptHelper.TryGetString(ed, LightningProtectorPrompts.EditTitle(data.Title), out string title)) return;
+            if (!PromptHelper.TryGetString(ed, LightningProtectorPrompts.EditType(data.Type), out string type)) return;
+            if (!PromptHelper.TryGetPositiveDouble(ed, LightningProtectorPrompts.EditHeight(data.HeightM), out double height)) return;
+            if (!PromptHelper.TryGetClearableDouble(ed, LightningProtectorPrompts.EditBaseHeight(data.BaseHeightM), out double? baseHeight)) return;
+            if (!PromptHelper.TryGetString(ed, LightningProtectorPrompts.EditDescription(data.Description), out string description)) return;
+            if (!PromptHelper.TryGetYesNo(ed, LightningProtectorPrompts.IsActive, ref isActive)) return;
+
+            OperationResult<LightningProtectorBlockData> result = LightningProtectorBlockService.Update(data,
+                new LightningProtectorBlockUpdateDto
+                {
+                    Name = name,
+                    Title = title,
+                    Type = type,
+                    HeightM = height,
+                    BaseHeightM = baseHeight,
+                    Description = description,
+                    IsActive = isActive,
+                });
+
+            if (!result.IsSuccess)
+            {
+                ed.WriteMessage("\n" + result.Message);
+                return;
+            }
+
+            IDictionary<string, string> newValues = LightningProtectorBlockService.ToAttributeValues(result.Result);
+
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                var br = (BlockReference)tr.GetObject(refId, OpenMode.ForRead);
+
+                BlockAttributeHelper.SetAttributeValues(tr, br, LightningProtectorAttributes.EditableTags
+                    .ToDictionary(tag => tag, tag => newValues[tag], StringComparer.OrdinalIgnoreCase));
+
+                tr.Commit();
+            }
+
+            ed.WriteMessage(string.Format(LightningProtectorPrompts.Updated, number));
         }
-
-        return numbers;
+        catch (AcException ex)
+        {
+            ed.WriteMessage($"\nAutoCAD error: {ex.ErrorStatus} - {ex.Message}");
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage("\nError: " + ex.Message);
+        }
     }
 }
