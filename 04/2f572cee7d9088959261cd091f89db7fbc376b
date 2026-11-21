@@ -1,0 +1,41 @@
+src/Lightning_Protection/LP.Core/Services/LightningProtectorBlockService.cs
+  s_2dbf17c9b5024d::t_0cc8cce020de92 4-5,50,65-126,128,130-131,133-135,137-139,141,144-148,150-151,157,161-202,211-217,219-220
+src/Lightning_Protection/LP.Plugin/Commands/LightningProtectorCommands.cs
+  s_2dbf17c9b5024d::t_d235aebbbd11d7 6,52,90-91,93-99,101,103,105-159,161-180
+src/Lightning_Protection/LP.Plugin/Drawing/LightningProtectorBlock.cs
+  s_2dbf17c9b5024d::t_77190b88cbd650 3,47,49,51,53,55,57,59,61
+src/Lightning_Protection/LP.Plugin/Drawing/LightningProtectorFinder.cs
+  s_2dbf17c9b5024d::t_8ef13f8923bf28 1-64
+src/Lightning_Protection/LP.Core/Models/LightningProtectors/Block/LightningProtectorBlockUpdateDto.cs
+  s_2dbf17c9b5024d::t_93e09d71259b63 1-13
+src/Lightning_Protection/LP.Plugin/Acad/BlockAttributeHelper.cs
+  s_2dbf17c9b5024d::t_21b5a9365edb4b 87-109
+src/Lightning_Protection/LP.Plugin/Acad/PromptHelper.cs
+  s_2dbf17c9b5024d::t_fd24506ed73926 20-29,34-39,51-54,79-142,153-158
+src/Lightning_Protection/LP.Plugin/Commands/LightningProtectorPrompts.cs
+  s_2dbf17c9b5024d::t_49020209db671c 2,11-16,53-85
+src/Lightning_Protection/LP.Plugin/Constants/CommandNames.cs
+  s_2dbf17c9b5024d::t_229a79927598cd 6
+src/Lightning_Protection/LP.Plugin/Models/LightningProtectorReferenceDto.cs
+  s_2dbf17c9b5024d::t_6a229cb816f3aa 1-9
+src/Lightning_Protection/LP.Plugin/Models/NumberPromptDto.cs
+  s_2dbf17c9b5024d::t_5476854de83c85 9
+src/Lightning_Protection/LP.Plugin/Models/TextPromptDto.cs
+  s_2dbf17c9b5024d::t_7530e3956677e5 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "042f572cee7d9088959261cd091f89db7fbc376b",
+  "prompts": {},
+  "sessions": {
+    "s_2dbf17c9b5024d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d936fda2-62c1-4901-ab31-632a2d562f05",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Vitali.Siamashka <vitali.siamashka@ventionteams.com>"
+    }
+  }
+}
