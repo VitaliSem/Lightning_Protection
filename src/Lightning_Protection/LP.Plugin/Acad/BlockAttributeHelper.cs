@@ -84,6 +84,29 @@ public static class BlockAttributeHelper
         return result;
     }
 
+    /// <summary>Writes the values into the matching attribute references of a block reference, keeping their placement.</summary>
+    public static void SetAttributeValues(Transaction tr, BlockReference br, IDictionary<string, string> values)
+    {
+        var db = br.Database;
+
+        foreach (ObjectId attId in br.AttributeCollection)
+        {
+            if (attId.IsErased || tr.GetObject(attId, OpenMode.ForRead) is not AttributeReference ar)
+                continue;
+
+            if (!TryGetIgnoreCase(values, ar.Tag, out var value))
+                continue;
+
+            ar.UpgradeOpen();
+            ar.TextString = value ?? "";
+
+            if (ar.IsMTextAttribute)
+                ar.UpdateMTextAttribute();
+            else if (ar.Justify != AttachmentPoint.BaseLeft)
+                ar.AdjustAlignment(db);
+        }
+    }
+
     private static bool TryGetIgnoreCase(IDictionary<string, string>? dict, string key, out string? value)
     {
         value = null;
