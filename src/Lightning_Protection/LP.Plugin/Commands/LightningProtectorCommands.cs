@@ -232,4 +232,62 @@ public class LightningProtectorCommands
             ed.WriteMessage("\nError: " + ex.Message);
         }
     }
+
+    [CommandMethod(CommandNames.LightningProtectorDelete)]
+    public void DeleteLightningProtector()
+    {
+        Document? doc = AcApp.DocumentManager.MdiActiveDocument;
+
+        if (doc is null)
+            return;
+
+        Database db = doc.Database;
+        Editor ed = doc.Editor;
+
+        try
+        {
+            if (!PromptHelper.TryGetPositiveInt(ed, LightningProtectorPrompts.Number, out var number)) return;
+
+            OperationResult<LightningProtectorReferenceDto> found;
+
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                found = LightningProtectorFinder.FindByNumber(tr, db, number);
+                tr.Commit();
+            }
+
+            if (!found.IsSuccess)
+            {
+                ed.WriteMessage("\n" + found.Message);
+                return;
+            }
+
+            found.Result.AttributeValues.TryGetValue(LightningProtectorAttributes.Name, out var name);
+
+            var confirmed = false;
+
+            if (!PromptHelper.TryGetYesNo(ed, LightningProtectorPrompts.ConfirmDelete(number, name ?? ""), ref confirmed) || !confirmed)
+            {
+                ed.WriteMessage(string.Format(LightningProtectorPrompts.DeleteCancelled, number));
+                return;
+            }
+            
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                var br = (BlockReference)tr.GetObject(found.Result.Id, OpenMode.ForWrite);
+                br.Erase();
+                tr.Commit();
+            }
+
+            ed.WriteMessage(string.Format(LightningProtectorPrompts.Deleted, number));
+        }
+        catch (AcException ex)
+        {
+            ed.WriteMessage($"\nAutoCAD error: {ex.ErrorStatus} - {ex.Message}");
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage("\nError: " + ex.Message);
+        }
+    }
 }

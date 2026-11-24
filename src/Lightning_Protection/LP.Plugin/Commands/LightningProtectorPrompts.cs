@@ -14,6 +14,8 @@ public static class LightningProtectorPrompts
     public const string Updated = "\nLightning protector #{0} updated.";
     public const string Activated = "\nLightning protector #{0} is now active.";
     public const string Deactivated = "\nLightning protector #{0} is now inactive.";
+    public const string Deleted = "\nLightning protector #{0} deleted.";
+    public const string DeleteCancelled = "\nLightning protector #{0} was not deleted.";
 
     private const string ClearHint = " (" + PromptHelper.ClearTextInput + " to clear)";
 
@@ -77,6 +79,11 @@ public static class LightningProtectorPrompts
         Unit = "m",
         DefaultValue = current,
     };
+
+    public static string ConfirmDelete(int number, string name) =>
+        string.IsNullOrWhiteSpace(name)
+            ? $"\nDelete lightning protector #{number}? "
+            : $"\nDelete lightning protector #{number} ({name})? ";
 
     private static TextPromptDto EditText(TextPromptDto source, string label, string current) => new()
     {
