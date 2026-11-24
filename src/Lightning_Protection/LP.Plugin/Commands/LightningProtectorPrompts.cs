@@ -12,6 +12,8 @@ public static class LightningProtectorPrompts
     public const string IsActive = "\nIs active: ";
 
     public const string Updated = "\nLightning protector #{0} updated.";
+    public const string Activated = "\nLightning protector #{0} is now active.";
+    public const string Deactivated = "\nLightning protector #{0} is now inactive.";
 
     private const string ClearHint = " (" + PromptHelper.ClearTextInput + " to clear)";
 

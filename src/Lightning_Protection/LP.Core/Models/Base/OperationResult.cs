@@ -2,7 +2,7 @@ using System;
 
 namespace LP.Core.Models.Base
 {
-    public class OperationResult<T> where T : class
+    public class OperationResult<T>
     {
         public T Result { get; private set; }
         public string Message { get; private set; }
