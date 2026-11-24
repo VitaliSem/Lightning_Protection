@@ -477,6 +477,112 @@ public class LightningProtectorBlockServiceTests
         Assert.False(LightningProtectorBlockService.Update(Current, null!).IsSuccess);
     }
 
+    // -------------------------------------------------------------------------
+    // ToggleActive
+    // -------------------------------------------------------------------------
+
+    private static Dictionary<string, string> MakeToggleValues(string isActive, string number = "4") =>
+        new Dictionary<string, string>
+        {
+            { LightningProtectorAttributes.Number, number },
+            { LightningProtectorAttributes.HeightM, "h=10" },
+            { LightningProtectorAttributes.IsActive, isActive },
+        };
+
+    [Theory]
+    [InlineData("true")]
+    [InlineData(" TRUE ")]
+    [InlineData("True")]
+    public void ToggleActive_True_ReturnsFalse(string isActive)
+    {
+        var result = LightningProtectorBlockService.ToggleActive(MakeToggleValues(isActive));
+
+        Assert.True(result.IsSuccess);
+        Assert.False(result.Result);
+    }
+
+    [Theory]
+    [InlineData("false")]
+    [InlineData(" False ")]
+    public void ToggleActive_False_ReturnsTrue(string isActive)
+    {
+        var result = LightningProtectorBlockService.ToggleActive(MakeToggleValues(isActive));
+
+        Assert.True(result.IsSuccess);
+        Assert.True(result.Result);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void ToggleActive_Blank_ReturnsTrue(string isActive)
+    {
+        var result = LightningProtectorBlockService.ToggleActive(MakeToggleValues(isActive));
+
+        Assert.True(result.IsSuccess);
+        Assert.True(result.Result);
+    }
+
+    [Theory]
+    [InlineData("yes")]
+    [InlineData("1")]
+    [InlineData("xyz")]
+    public void ToggleActive_UnparseableValue_ReturnsFail(string isActive)
+    {
+        var result = LightningProtectorBlockService.ToggleActive(MakeToggleValues(isActive));
+
+        Assert.False(result.IsSuccess);
+        Assert.Contains("#4", result.Message);
+        Assert.Contains(isActive, result.Message);
+    }
+
+    [Fact]
+    public void ToggleActive_MissingTag_ReturnsFail()
+    {
+        var values = new Dictionary<string, string> { { LightningProtectorAttributes.Number, "4" } };
+
+        var result = LightningProtectorBlockService.ToggleActive(values);
+
+        Assert.False(result.IsSuccess);
+        Assert.Contains(LightningProtectorAttributes.IsActive, result.Message);
+    }
+
+    [Fact]
+    public void ToggleActive_Null_ReturnsFail()
+    {
+        Assert.False(LightningProtectorBlockService.ToggleActive(null!).IsSuccess);
+    }
+
+    [Fact]
+    public void ToggleActive_KeysAreCaseInsensitive()
+    {
+        var values = new Dictionary<string, string> { { "is_active", "false" } };
+
+        var result = LightningProtectorBlockService.ToggleActive(values);
+
+        Assert.True(result.IsSuccess);
+        Assert.True(result.Result);
+    }
+
+    [Fact]
+    public void ToggleActive_InvalidHeight_StillToggles()
+    {
+        var values = MakeToggleValues("true");
+        values[LightningProtectorAttributes.HeightM] = "h=abc";
+
+        var result = LightningProtectorBlockService.ToggleActive(values);
+
+        Assert.True(result.IsSuccess);
+        Assert.False(result.Result);
+    }
+
+    [Fact]
+    public void FormatIsActive_ReturnsAttributeText()
+    {
+        Assert.Equal("true", LightningProtectorBlockService.FormatIsActive(true));
+        Assert.Equal("false", LightningProtectorBlockService.FormatIsActive(false));
+    }
+
     [Fact]
     public void EditableTags_ExcludeNumber()
     {

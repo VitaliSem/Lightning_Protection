@@ -100,7 +100,7 @@ public class LightningProtectorCommands
 
         try
         {
-            if (!PromptHelper.TryGetPositiveInt(ed, LightningProtectorPrompts.Number, out int number)) return;
+            if (!PromptHelper.TryGetPositiveInt(ed, LightningProtectorPrompts.Number, out var number)) return;
 
             OperationResult<LightningProtectorReferenceDto> found;
 
@@ -128,7 +128,7 @@ public class LightningProtectorCommands
             }
 
             LightningProtectorBlockData data = current.Result;
-            bool isActive = data.IsActive;
+            var isActive = data.IsActive;
 
             if (!PromptHelper.TryGetString(ed, LightningProtectorPrompts.EditName(data.Name), out string name)) return;
             if (!PromptHelper.TryGetString(ed, LightningProtectorPrompts.EditTitle(data.Title), out string title)) return;
@@ -169,6 +169,59 @@ public class LightningProtectorCommands
             }
 
             ed.WriteMessage(string.Format(LightningProtectorPrompts.Updated, number));
+        }
+        catch (AcException ex)
+        {
+            ed.WriteMessage($"\nAutoCAD error: {ex.ErrorStatus} - {ex.Message}");
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage("\nError: " + ex.Message);
+        }
+    }
+
+    [CommandMethod(CommandNames.LightningProtectorToggleActive)]
+    public void ToggleLightningProtectorActive()
+    {
+        Document? doc = AcApp.DocumentManager.MdiActiveDocument;
+
+        if (doc is null)
+            return;
+
+        Database db = doc.Database;
+        Editor ed = doc.Editor;
+
+        try
+        {
+            if (!PromptHelper.TryGetPositiveInt(ed, LightningProtectorPrompts.Number, out var number)) return;
+
+            using Transaction tr = db.TransactionManager.StartTransaction();
+
+            OperationResult<LightningProtectorReferenceDto> found = LightningProtectorFinder.FindByNumber(tr, db, number);
+
+            if (!found.IsSuccess)
+            {
+                ed.WriteMessage("\n" + found.Message);
+                return;
+            }
+
+            OperationResult<bool> toggled = LightningProtectorBlockService.ToggleActive(found.Result.AttributeValues);
+
+            if (!toggled.IsSuccess)
+            {
+                ed.WriteMessage("\n" + toggled.Message);
+                return;
+            }
+
+            var br = (BlockReference)tr.GetObject(found.Result.Id, OpenMode.ForRead);
+
+            BlockAttributeHelper.SetAttributeValues(tr, br, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                { LightningProtectorAttributes.IsActive, LightningProtectorBlockService.FormatIsActive(toggled.Result) },
+            });
+
+            tr.Commit();
+            ed.WriteMessage(string.Format(toggled.Result ? LightningProtectorPrompts.Activated : LightningProtectorPrompts.Deactivated, number));
         }
         catch (AcException ex)
         {

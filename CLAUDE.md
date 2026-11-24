@@ -85,4 +85,4 @@ The AutoCAD abstractions in `LP.Core` (`IAcadDocument`, `IAcadTransaction`) are 
 - Single wire protection area — **complete** (Table 10.2, including tangent-line geometry)
 - Double rod protection area — **implemented** (`DoubleRodProtectionService`, with tests); geometry of the combined outline still to be verified against the standard
 - Double wire protection area — **not implemented** (throws `NotImplementedException`)
-- AutoCAD plugin (`LP.Plugin`) — **in progress**: `lightning_protector_insert` and `lightning_protector_edit` implemented; protection-area drawing commands not yet
+- AutoCAD plugin (`LP.Plugin`) — **in progress**: `lightning_protector_insert`, `lightning_protector_edit` and `lightning_protector_toggle_active` implemented; protection-area drawing commands not yet

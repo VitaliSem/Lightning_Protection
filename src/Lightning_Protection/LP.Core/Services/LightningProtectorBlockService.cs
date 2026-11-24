@@ -158,6 +158,46 @@ namespace LP.Core.Services
             }
         }
 
+        /// <summary>
+        /// Returns the opposite of the active status stored in the attribute values of a block reference;
+        /// a blank status counts as inactive. Fails when the status attribute is missing or cannot be interpreted.
+        /// </summary>
+        public static OperationResult<bool> ToggleActive(IDictionary<string, string> values)
+        {
+            try
+            {
+                if (values == null)
+                    return OperationResult<bool>.Fail("Attribute values cannot be null.");
+
+                var lookup = new Dictionary<string, string>(values, StringComparer.OrdinalIgnoreCase);
+
+                var protector = AttributeValueHelper.TryParseNumber(AttributeValueHelper.GetValue(lookup, LightningProtectorAttributes.Number), out var number)
+                    ? string.Format(CultureInfo.InvariantCulture, "protector #{0}", number)
+                    : "the protector";
+
+                if (!lookup.ContainsKey(LightningProtectorAttributes.IsActive))
+                    return OperationResult<bool>.Fail(
+                        string.Format(CultureInfo.InvariantCulture, "The {0} attribute of {1} is missing.", LightningProtectorAttributes.IsActive, protector));
+
+                var text = AttributeValueHelper.Clean(AttributeValueHelper.GetValue(lookup, LightningProtectorAttributes.IsActive));
+
+                if (text.Length == 0)
+                    return OperationResult<bool>.Ok(true);
+
+                if (!bool.TryParse(text, out var isActive))
+                    return OperationResult<bool>.Fail(
+                        string.Format(CultureInfo.InvariantCulture, "The active status of {0} ('{1}') cannot be interpreted.", protector, text));
+
+                return OperationResult<bool>.Ok(!isActive);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult<bool>.Fail("An unexpected error occurred while toggling the protector status.", ex);
+            }
+        }
+
+        public static string FormatIsActive(bool isActive) => isActive ? "true" : "false";
+
         private static string Validate(LightningProtectorBlockData data)
         {
             if (data.HeightM <= 0)
@@ -217,7 +257,7 @@ namespace LP.Core.Services
                     ? LightningProtectorAttributes.BaseHeightPrefix + data.BaseHeightM.Value.ToString("0.##", CultureInfo.InvariantCulture)
                     : string.Empty },
                 { LightningProtectorAttributes.Description, data.Description ?? string.Empty },
-                { LightningProtectorAttributes.IsActive, data.IsActive ? "true" : "false" }
+                { LightningProtectorAttributes.IsActive, FormatIsActive(data.IsActive) }
             };
         }
     }
