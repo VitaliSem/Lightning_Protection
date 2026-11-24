@@ -290,4 +290,81 @@ public class LightningProtectorCommands
             ed.WriteMessage("\nError: " + ex.Message);
         }
     }
+
+    [CommandMethod(CommandNames.LightningProtectorFocus, CommandFlags.Redraw)]
+    public void FocusLightningProtector()
+    {
+        Document? doc = AcApp.DocumentManager.MdiActiveDocument;
+
+        if (doc is null)
+            return;
+
+        Database db = doc.Database;
+        Editor ed = doc.Editor;
+
+        try
+        {
+            if (!PromptHelper.TryGetPositiveInt(ed, LightningProtectorPrompts.Number, out var number)) return;
+
+            ObjectId refId;
+            Extents3d extents;
+            string layoutName;
+            string? hiddenLayer = null;
+
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                OperationResult<LightningProtectorReferenceDto> found = LightningProtectorFinder.FindByNumber(tr, db, number);
+
+                if (!found.IsSuccess)
+                {
+                    ed.WriteMessage("\n" + found.Message);
+                    return;
+                }
+
+                refId = found.Result.Id;
+
+                var br = (BlockReference)tr.GetObject(refId, OpenMode.ForRead);
+                extents = ViewHelper.GetExtentsOrPoint(br, br.Position);
+                layoutName = ViewHelper.GetLayoutName(tr, br.OwnerId);
+
+                var layer = (LayerTableRecord)tr.GetObject(br.LayerId, OpenMode.ForRead);
+
+                if (layer.IsOff || layer.IsFrozen)
+                    hiddenLayer = layer.Name;
+
+                tr.Commit();
+            }
+
+            ViewHelper.ActivateLayout(db, ed, layoutName);
+
+            OperationResult<ViewWindow> window = ViewFocusService.CalculateFocusWindow(new ViewFocusDto
+            {
+                Min = new Point3D(extents.MinPoint.X, extents.MinPoint.Y, extents.MinPoint.Z),
+                Max = new Point3D(extents.MaxPoint.X, extents.MaxPoint.Y, extents.MaxPoint.Z),
+                AspectRatio = ViewHelper.GetViewAspectRatio(ed),
+            });
+
+            if (!window.IsSuccess)
+            {
+                ed.WriteMessage("\n" + window.Message);
+                return;
+            }
+
+            ViewHelper.ZoomToWindow(ed, window.Result);
+            ed.SetImpliedSelection([refId]);
+
+            ed.WriteMessage(string.Format(LightningProtectorPrompts.Focused, number));
+
+            if (hiddenLayer is not null)
+                ed.WriteMessage(string.Format(LightningProtectorPrompts.HiddenLayer, hiddenLayer));
+        }
+        catch (AcException ex)
+        {
+            ed.WriteMessage($"\nAutoCAD error: {ex.ErrorStatus} - {ex.Message}");
+        }
+        catch (System.Exception ex)
+        {
+            ed.WriteMessage("\nError: " + ex.Message);
+        }
+    }
 }

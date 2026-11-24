@@ -16,6 +16,8 @@ public static class LightningProtectorPrompts
     public const string Deactivated = "\nLightning protector #{0} is now inactive.";
     public const string Deleted = "\nLightning protector #{0} deleted.";
     public const string DeleteCancelled = "\nLightning protector #{0} was not deleted.";
+    public const string Focused = "\nLightning protector #{0} in focus.";
+    public const string HiddenLayer = "\nLayer \"{0}\" of the lightning protector is off or frozen, so the block is not visible.";
 
     private const string ClearHint = " (" + PromptHelper.ClearTextInput + " to clear)";
 

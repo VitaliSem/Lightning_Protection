@@ -12,7 +12,7 @@ Project-specific guidance for `LP.Core`. Cross-project rules (build/test command
 - `Models/` — domain models (see below).
 - `Services/` — calculation and block-data services.
 - `Interfaces/` — service contract and AutoCAD abstractions.
-- `Constants/` — names that must not be hard-coded elsewhere: `LightningProtectorAttributes` (attribute tags, height text prefixes, editable-tag list).
+- `Constants/` — names that must not be hard-coded elsewhere: `LightningProtectorAttributes` (attribute tags, height text prefixes, editable-tag list), `ViewFocusConstants` (fill fraction and minimum view height used when focusing the view).
 - `Helpers/` — generic helpers: `AttributeValueHelper` (`Clean`, `GetValue`, `TryParseNumber`).
 - `Enums/` — e.g. `LightningProtectionReliability`.
 
@@ -24,6 +24,7 @@ Base models in `Models/Base/` (namespace `LP.Core.Models.Base`):
 - `ProtectionPoint` (Point3D + optional Radius + IsLastPoint flag)
 - `ProtectionArea` (list of ProtectionPoint)
 - `OperationResult<T>` — generic result wrapper with IsSuccess/Message/Exception (`Ok(...)` / `Fail(message, exception)`)
+- `ViewFocusDto` (extents min/max + view aspect ratio) and `ViewWindow` (centre, width, height) — input and output of `ViewFocusService`
 
 Protector models in `Models/LightningProtectors/<Type>/` (namespace `LP.Core.Models.LightningProtectors.<Type>`):
 - `SingleRod/SingleRodLightningProtector` — one position + height
@@ -55,6 +56,7 @@ Service implementations (`Services/SN_4_04_03/`):
 
 Other services (`Services/`):
 - `GeometryService` — static 2D helpers: Get2DDistance, GetAngleToHorizontal, GetTangentDeviationAngle (Z is ignored).
+- `ViewFocusService` — `CalculateFocusWindow`: a view window centred on given extents, sized so they fill a fixed share of the view at the view's aspect ratio (validated `OperationResult<ViewWindow>`).
 - `LightningProtectorBlockService` — data rules of the lightning protector block: block/layer names, validation limits, numbering (`GetNextNumber`), `Create` / `Update` (validated `OperationResult<LightningProtectorBlockData>`), and conversion to/from attribute values (`ToAttributeValues` / `FromAttributeValues`).
 
 ## Key Interfaces (`Interfaces/`)
