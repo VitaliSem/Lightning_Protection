@@ -1,0 +1,31 @@
+CLAUDE.md
+  s_c9daeabfde3e68::t_2b6a119e47c00f 88
+src/Lightning_Protection/LP.Core.Tests/Services/LightningProtectorBlockServiceTests.cs
+  s_c9daeabfde3e68::t_685072d5b5b056 480-585
+src/Lightning_Protection/LP.Core/Models/Base/OperationResult.cs
+  s_c9daeabfde3e68::t_5260e200746fac 5
+src/Lightning_Protection/LP.Plugin/AGENTS.md
+  s_c9daeabfde3e68::t_b39508f61f9e47 34
+src/Lightning_Protection/LP.Plugin/Commands/LightningProtectorCommands.cs
+  s_c9daeabfde3e68::t_97212ccfd16e45 103,131,182-234
+src/Lightning_Protection/LP.Plugin/Commands/LightningProtectorPrompts.cs
+  s_c9daeabfde3e68::t_a2c27b3f237af4 15-16
+src/Lightning_Protection/LP.Plugin/Constants/CommandNames.cs
+  s_c9daeabfde3e68::t_54f14f8e820275 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "35807e6a2ae68b15c727456acc98ae8a1858f69c",
+  "prompts": {},
+  "sessions": {
+    "s_c9daeabfde3e68": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa1a6e00-03ab-4e4a-b59d-7e0a3d255f85",
+        "model": "unknown"
+      },
+      "human_author": "Vitali.Siamashka <vitali.siamashka@ventionteams.com>"
+    }
+  }
+}
