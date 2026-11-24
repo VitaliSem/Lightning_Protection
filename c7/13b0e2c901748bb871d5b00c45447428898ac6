@@ -1,0 +1,27 @@
+CLAUDE.md
+  s_98e7cf45ae04d5::t_9ab839046aef05 88
+src/Lightning_Protection/LP.Plugin/AGENTS.md
+  s_98e7cf45ae04d5::t_873f3de62aaeaa 35
+src/Lightning_Protection/LP.Plugin/Commands/LightningProtectorCommands.cs
+  s_98e7cf45ae04d5::t_eae6e0309b64b8 235-292
+src/Lightning_Protection/LP.Plugin/Commands/LightningProtectorPrompts.cs
+  s_98e7cf45ae04d5::t_fdd8f7ffd7f621 17-18,83-87
+src/Lightning_Protection/LP.Plugin/Constants/CommandNames.cs
+  s_98e7cf45ae04d5::t_cd200656a746c1 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c713b0e2c901748bb871d5b00c45447428898ac6",
+  "prompts": {},
+  "sessions": {
+    "s_98e7cf45ae04d5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b595ffb2-7362-4fed-add1-2be3a193d9df",
+        "model": "unknown"
+      },
+      "human_author": "Vitali.Siamashka <vitali.siamashka@ventionteams.com>"
+    }
+  }
+}
