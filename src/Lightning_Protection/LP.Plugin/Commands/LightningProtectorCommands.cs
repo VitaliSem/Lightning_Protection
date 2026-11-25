@@ -21,7 +21,7 @@ namespace LP.Plugin.Commands;
 
 public class LightningProtectorCommands
 {
-    [CommandMethod(CommandNames.LightningProtectorInsert)]
+    [CommandMethod(CommandNames.LightningProtector.Insert)]
     public void InsertLightningProtector()
     {
         Document? doc = AcApp.DocumentManager.MdiActiveDocument;
@@ -87,7 +87,7 @@ public class LightningProtectorCommands
         }
     }
 
-    [CommandMethod(CommandNames.LightningProtectorEdit)]
+    [CommandMethod(CommandNames.LightningProtector.Edit)]
     public void EditLightningProtector()
     {
         Document? doc = AcApp.DocumentManager.MdiActiveDocument;
@@ -180,7 +180,7 @@ public class LightningProtectorCommands
         }
     }
 
-    [CommandMethod(CommandNames.LightningProtectorToggleActive)]
+    [CommandMethod(CommandNames.LightningProtector.ToggleActive)]
     public void ToggleLightningProtectorActive()
     {
         Document? doc = AcApp.DocumentManager.MdiActiveDocument;
@@ -233,7 +233,7 @@ public class LightningProtectorCommands
         }
     }
 
-    [CommandMethod(CommandNames.LightningProtectorDelete)]
+    [CommandMethod(CommandNames.LightningProtector.Delete)]
     public void DeleteLightningProtector()
     {
         Document? doc = AcApp.DocumentManager.MdiActiveDocument;
@@ -291,7 +291,7 @@ public class LightningProtectorCommands
         }
     }
 
-    [CommandMethod(CommandNames.LightningProtectorFocus, CommandFlags.Redraw)]
+    [CommandMethod(CommandNames.LightningProtector.Focus, CommandFlags.Redraw)]
     public void FocusLightningProtector()
     {
         Document? doc = AcApp.DocumentManager.MdiActiveDocument;

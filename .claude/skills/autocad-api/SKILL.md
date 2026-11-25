@@ -1,6 +1,6 @@
 ---
 name: autocad-api
-description: AutoCAD .NET API patterns for the Lightning_Protection plugin — layers, primitives (Line/Circle/Polyline with bulge arcs), DBText/MText and text styles, blocks with attributes, annotative blocks and annotation scales (CANNOSCALE). Use whenever writing or reviewing code in LP.Plugin (net48 + net8.0) or LP.UI that touches AutoCAD (Database, Transaction, Entity, BlockTableRecord, LayerTable, AnnotationScale), or when drawing an LP.Core ProtectionArea (single rod, single wire, double rod) into a drawing.
+description: AutoCAD .NET API patterns for the Lightning_Protection plugin — layers, primitives (Line/Circle/Polyline with bulge arcs), DBText/MText and text styles, blocks with attributes, annotative blocks and annotation scales (CANNOSCALE). Use whenever writing or reviewing code in LP.Plugin (net48 + net8.0-windows) that touches AutoCAD (Database, Transaction, Entity, BlockTableRecord, LayerTable, AnnotationScale), or when drawing an LP.Core ProtectionArea (single rod, single wire, double rod) into a drawing.
 ---
 
 # AutoCAD .NET API for Lightning_Protection
@@ -16,8 +16,8 @@ Working rules and ready-to-copy helpers for the AutoCAD side of the solution
 | --- | --- | --- | --- |
 | `LP.Core` | `netstandard2.0` | **never** | Calculations, `ProtectionArea`, `OperationResult<T>`, `IAcadDocument`/`IAcadTransaction`. C# 7.3 style, no nullable, no implicit usings. |
 | `LP.Core.Tests` | `net8.0`, xUnit | no | Tests for LP.Core only. |
-| `LP.Plugin` | `net8.0;net48` (one SDK project) | yes | `net48` → `AutoCAD.NET` 24.3.0 (AutoCAD 2024); `net8.0` → `AutoCAD.NET.Core` 25.0.0 (AutoCAD 2025+). `ExcludeAssets=runtime`. **LangVersion 12, ImplicitUsings, Nullable enabled.** All code from this skill goes here. |
-| `LP.UI` | .NET Framework 4.8, WinForms | via the plugin | Only `net48`; cannot be referenced by the `net8.0` build as-is. |
+| `LP.Plugin` | `net8.0-windows;net48` (one SDK project, `UseWPF`) | yes | `net48` → `AutoCAD.NET` 24.3.0 (AutoCAD 2024); `net8.0-windows` → `AutoCAD.NET` + `AutoCAD.NET.Core` 25.0.0 (AutoCAD 2025+). `ExcludeAssets=runtime`. **LangVersion 12, ImplicitUsings, Nullable enabled.** All code from this skill goes here. |
+| `LP.UI` | `net8.0-windows;net48`, WPF library | no | The window; references LP.Core only. The plugin shows it via `lightning_protection_ui`. |
 
 Recommended folders inside `LP.Plugin`: `Acad/` (helpers from `examples/`), `Drawing/` (`ProtectionAreaDrawer`),
 `Commands/` (`[CommandMethod]` classes). `LP.Plugin.csproj` currently has **no `ProjectReference` to LP.Core** —
@@ -35,8 +35,8 @@ LP.Core namespaces: `LP.Core.Models.Base`, `LP.Core.Enums`, `LP.Core.Interfaces`
   `string.Contains(string, StringComparison)`, `Dictionary.GetValueOrDefault`, `HashSet(capacity)`, `KeyValuePair` deconstruction,
   and the nullable attributes (`[NotNullWhen]`, `[MaybeNull]` … — not in net48 without a polyfill).
 - **`Application`: use `Autodesk.AutoCAD.ApplicationServices.Core.Application`** (in AcCoreMgd). The full
-  `Autodesk.AutoCAD.ApplicationServices.Application` lives in AcMgd, which the `net8.0` target does not reference
-  (`AutoCAD.NET.Core` only). Alias: `using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;`.
+  `Autodesk.AutoCAD.ApplicationServices.Application` lives in AcMgd; use it only for what Core lacks
+  (e.g. `ShowModelessWindow`). Alias: `using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;`.
   `Document`, `DocumentCollection`, `Editor`, `CommandMethod`, `CommandClass` are all in AcCoreMgd.
 - Version-specific code: `#if NET8_0_OR_GREATER` (AutoCAD 2025+) / `#else` (AutoCAD 2024).
 - Nullable: lookups return `T?` / `ObjectId.Null`; never pass `null!` to AutoCAD setters; `ObjectId` is a struct.
@@ -51,7 +51,7 @@ LP.Core namespaces: `LP.Core.Models.Base`, `LP.Core.Enums`, `LP.Core.Interfaces`
 4. **`table.Has(name)` before `table[name]`** (else `eKeyNotFound`); names are case-insensitive; validate new names
    with `SymbolUtilityServices.ValidateSymbolName(name, false)`.
 5. **Layer / linetype / style must exist** before assigning `Entity.Layer`, `.Linetype`, `.TextStyleId`.
-6. **Lock the document** outside a `[CommandMethod]` (LP.UI forms, palettes, events): `using (doc.LockDocument())`.
+6. **Lock the document** outside a `[CommandMethod]` (modeless LP.UI window, palettes, events): `using (doc.LockDocument())`.
 7. **Locked layers:** `tr.GetObject(id, OpenMode.ForWrite, false, true)` or catch `ErrorStatus.OnLockedLayer`.
 8. Alias `using AcException = Autodesk.AutoCAD.Runtime.Exception;` (implicit usings bring `System` in).
    `FontDescriptor` needs `using FontDescriptor = Autodesk.AutoCAD.GraphicsInterface.FontDescriptor;`
@@ -118,7 +118,7 @@ LP.Core namespaces: `LP.Core.Models.Base`, `LP.Core.Enums`, `LP.Core.Interfaces`
 | `eOnLockedLayer` | unlock layer or `GetObject(id, ForWrite, false, true)` |
 | `eWasErased` | check `id.IsErased` |
 | `eLockViolation` | modifying from modeless UI without `doc.LockDocument()` |
-| `CS0234 ... Application` on net8.0 | use `ApplicationServices.Core.Application` |
+| `Application` ambiguous or missing | use `ApplicationServices.Core.Application` (alias `AcApp`) |
 | Changes vanish | transaction not committed |
 | Block inserted without attributes | `AttributeReference`s must be created from definitions |
 | Annotative object at wrong size | no context for the current scale — add one |
