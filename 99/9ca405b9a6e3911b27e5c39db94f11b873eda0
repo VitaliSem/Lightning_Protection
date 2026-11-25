@@ -1,0 +1,75 @@
+.claude/skills/autocad-api/SKILL.md
+  s_4e0facbe567c09::t_ebd443548928ad 3,19-20,38-39,54,121
+.claude/skills/autocad-api/references/blocks.md
+  s_4e0facbe567c09::t_7a2edd0b4b53e2 117
+CLAUDE.md
+  s_4e0facbe567c09::t_d12250f1f8a1b5 12-13,16-18,23-24,60-62,71-72,80,94
+src/Lightning_Protection/LP.Plugin/Commands/LightningProtectorCommands.cs
+  s_4e0facbe567c09::t_557d4db659b7c3 24,90,183,236,294
+src/Lightning_Protection/LP.Plugin/Commands/UserInterfaceCommands.cs
+  s_4e0facbe567c09::t_e95974696f1ecb 1-44
+src/Lightning_Protection/LP.UI.App/App.xaml
+  s_4e0facbe567c09::t_9efafb65baa735 1-4
+src/Lightning_Protection/LP.UI.App/LP.UI.App.csproj
+  s_4e0facbe567c09::t_0fb7ec0f045c80 1-18
+src/Lightning_Protection/LP.UI/LP.UI.csproj
+  s_4e0facbe567c09::t_88a08f7bb7b5f4 1-16
+src/Lightning_Protection/LP.UI/MainWindow.xaml
+  s_4e0facbe567c09::t_dc428d8d9ae3dc 1-62
+src/Lightning_Protection/Lightning_Protection.slnx
+  s_4e0facbe567c09::t_6a222f94ecd024 5,7
+src/Lightning_Protection/LP.Core/AGENTS.md
+  s_4e0facbe567c09::t_af0790ab4fffcb 65
+src/Lightning_Protection/LP.Core/Interfaces/ILightningProtectorRepository.cs
+  s_4e0facbe567c09::t_e6468c74a63d97 1-8
+src/Lightning_Protection/LP.Plugin/AGENTS.md
+  s_4e0facbe567c09::t_30de6d09605c42 7,9-11,15,22,25,39-44
+src/Lightning_Protection/LP.Plugin/Constants/CommandNames.cs
+  s_4e0facbe567c09::t_661fa9825849a2 5-17
+src/Lightning_Protection/LP.Plugin/Drawing/AcadLightningProtectorRepository.cs
+  s_4e0facbe567c09::t_c9d23ee749be0e 1-21
+src/Lightning_Protection/LP.Plugin/LP.Plugin.csproj
+  s_4e0facbe567c09::t_828393cc8cc614 7-11,21-25,33
+src/Lightning_Protection/LP.UI.App/App.xaml.cs
+  s_4e0facbe567c09::t_960c93e9e77429 1-17
+src/Lightning_Protection/LP.UI.App/Services/InMemoryLightningProtectorRepository.cs
+  s_4e0facbe567c09::t_1dca1055fad785 1-9
+src/Lightning_Protection/LP.UI/AGENTS.md
+  s_4e0facbe567c09::t_f71d6565b37c1c 1-36
+src/Lightning_Protection/LP.UI/Infrastructure/ObservableObject.cs
+  s_4e0facbe567c09::t_e5801040a93ed1 1,4,6-8,10-11,13-23
+src/Lightning_Protection/LP.UI/Infrastructure/RelayCommand.cs
+  s_4e0facbe567c09::t_c37744a54ae2b0 1-18
+src/Lightning_Protection/LP.UI/MainWindow.xaml.cs
+  s_4e0facbe567c09::t_bff19efbed49cf 1-18
+src/Lightning_Protection/LP.UI/Themes/Styles.xaml
+  s_4e0facbe567c09::t_cfc5c9f650e458 1-247
+src/Lightning_Protection/LP.UI/ViewModels/LightningProtectorItemViewModel.cs
+  s_4e0facbe567c09::t_411477766a1ed9 1-35
+src/Lightning_Protection/LP.UI/ViewModels/LightningProtectorsPageViewModel.cs
+  s_4e0facbe567c09::t_73fea62287584e 1-81
+src/Lightning_Protection/LP.UI/ViewModels/MainViewModel.cs
+  s_4e0facbe567c09::t_9bf4023c4d14fc 1-46
+src/Lightning_Protection/LP.UI/ViewModels/PageViewModel.cs
+  s_4e0facbe567c09::t_deba31dc736893 1-15
+src/Lightning_Protection/LP.UI/Views/LightningProtectorsPage.xaml
+  s_4e0facbe567c09::t_5eecbd73042fd7 1-154
+src/Lightning_Protection/LP.UI/Views/LightningProtectorsPage.xaml.cs
+  s_4e0facbe567c09::t_7edaaabc619b6d 1-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "999ca405b9a6e3911b27e5c39db94f11b873eda0",
+  "prompts": {},
+  "sessions": {
+    "s_4e0facbe567c09": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6658ad03-4aaf-450f-8618-9b50b1fc53a7",
+        "model": "unknown"
+      },
+      "human_author": "Vitali.Siamashka <vitali.siamashka@ventionteams.com>"
+    }
+  }
+}
