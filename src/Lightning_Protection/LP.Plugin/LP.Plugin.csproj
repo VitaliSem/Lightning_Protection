@@ -4,7 +4,11 @@
         <LangVersion>12</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <TargetFrameworks>net8.0;net48</TargetFrameworks>
+        <TargetFrameworks>net8.0-windows;net48</TargetFrameworks>
+        <!-- WPF is needed to host the LP.UI window inside AutoCAD -->
+        <UseWPF>true</UseWPF>
+        <!-- AutoCAD.NET 25.0.0 constrains AutoCAD.NET.Core to an unpublished version (see the net8.0-windows packages) -->
+        <NoWarn>$(NoWarn);NU1608</NoWarn>
     </PropertyGroup>
 
     <!-- Settings for AUTOCAD 2024 (.NET Framework 4.8) -->
@@ -14,7 +18,11 @@
         </PackageReference>
     </ItemGroup>
     <!-- Settings for AUTOCAD 2025+ (.NET 8.0) -->
-    <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+        <PackageReference Include="AutoCAD.NET" Version="25.0.0">
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+        <!-- AutoCAD.NET 25.0.0 declares an unpublished AutoCAD.NET.Core 25.0.0-V058; pin the released one -->
         <PackageReference Include="AutoCAD.NET.Core" Version="25.0.0">
             <ExcludeAssets>runtime</ExcludeAssets>
         </PackageReference>
@@ -22,6 +30,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\LP.Core\LP.Core.csproj" />
+        <ProjectReference Include="..\LP.UI\LP.UI.csproj" />
     </ItemGroup>
 
 </Project>

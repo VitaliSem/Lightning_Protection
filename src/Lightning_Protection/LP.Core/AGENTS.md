@@ -62,6 +62,7 @@ Other services (`Services/`):
 ## Key Interfaces (`Interfaces/`)
 
 - `ILightningProtectionService` — main service contract (single rod, single wire, double rod, double wire)
+- `ILightningProtectorRepository` — source of lightning protectors for the UI (for now only the source name; reading and changing protectors come in a follow-up task); implemented by LP.Plugin for the active drawing and by LP.UI.App without a drawing
 - `IAcadDocument` — document abstraction (Name, ExecuteInTransaction, GetModelSpace, Regen)
 - `IAcadTransaction` — transaction abstraction (GetObject, AddEntity, IDisposable)
 

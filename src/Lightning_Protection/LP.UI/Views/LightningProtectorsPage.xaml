@@ -1,0 +1,154 @@
+<UserControl x:Class="LP.UI.Views.LightningProtectorsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:LP.UI.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:LightningProtectorsPageViewModel}"
+             d:DesignWidth="580" d:DesignHeight="520">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LP.UI;component/Themes/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="{Binding Title}" Style="{StaticResource PageHeader}" />
+
+        <Border Grid.Row="1" Style="{StaticResource Card}">
+            <DockPanel>
+                <!-- Toolbar -->
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10,8">
+                    <Button Style="{StaticResource Btn}" Padding="8,0" Command="{Binding AddCommand}" AutomationProperties.Name="Add"
+                            ToolTip="Add a lightning protector">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Style="{StaticResource IconPath}" Data="{StaticResource IconAdd}" StrokeThickness="1.6" Margin="0,0,5,0" />
+                            <TextBlock Text="Add" />
+                        </StackPanel>
+                    </Button>
+
+                    <Rectangle Width="1" Height="20" Fill="{StaticResource BorderSoftBrush}" Margin="5,0" />
+
+                    <Button Style="{StaticResource Btn}" Padding="8,0" Margin="0,0,3,0" Command="{Binding EditCommand}" AutomationProperties.Name="Edit"
+                            ToolTip="Edit the selected lightning protector">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Style="{StaticResource IconPath}" Data="{StaticResource IconEdit}" StrokeThickness="1" Margin="0,0,5,0" />
+                            <TextBlock Text="Edit" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource Btn}" Padding="8,0" Command="{Binding DeleteCommand}" AutomationProperties.Name="Delete"
+                            ToolTip="Delete the selected lightning protector">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Style="{StaticResource IconPath}" Data="{StaticResource IconDelete}" StrokeThickness="1" Margin="0,0,5,0" />
+                            <TextBlock Text="Delete" />
+                        </StackPanel>
+                    </Button>
+
+                    <Rectangle Width="1" Height="20" Fill="{StaticResource BorderSoftBrush}" Margin="5,0" />
+
+                    <Button Style="{StaticResource BtnToggleActive}" Command="{Binding ToggleActiveCommand}"
+                            Content="{Binding ToggleText}" Tag="{Binding IsSelectedActive}"
+                            ToolTip="Switch the selected lightning protector between active and inactive" />
+                </StackPanel>
+
+                <!-- List summary -->
+                <Border DockPanel.Dock="Top" BorderBrush="{StaticResource BorderSoftBrush}" BorderThickness="0,1,0,0" Padding="10,6">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Right" FontSize="11.5" Foreground="{StaticResource MutedBrush}">
+                            <Run Text="Selected:" />
+                            <Run Text="{Binding SelectedText, Mode=OneWay}" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" />
+                        </TextBlock>
+                        <TextBlock FontSize="12.5">
+                            <Run Text="On the drawing" FontWeight="SemiBold" />
+                            <Run Text="{Binding Summary, Mode=OneWay}" FontSize="11.5" Foreground="{StaticResource MutedBrush}" />
+                        </TextBlock>
+                    </DockPanel>
+                </Border>
+
+                <!-- Protectors -->
+                <DataGrid x:Name="ProtectorsGrid"
+                          ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}"
+                          AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow"
+                          HeadersVisibility="Column" GridLinesVisibility="None"
+                          CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" CanUserReorderColumns="False"
+                          Background="White" BorderThickness="0" FontSize="12"
+                          ColumnHeaderStyle="{StaticResource GridHeader}"
+                          CellStyle="{StaticResource GridCell}"
+                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow" BasedOn="{StaticResource GridRow}">
+                            <Setter Property="ToolTip" Value="{Binding Description}" />
+                            <Setter Property="ToolTipService.IsEnabled" Value="{Binding HasDescription}" />
+                        </Style>
+                    </DataGrid.RowStyle>
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Status" Width="90" SortMemberPath="IsActive">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="{x:Type vm:LightningProtectorItemViewModel}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse x:Name="Dot" Width="8" Height="8" Margin="0,0,5,0" Fill="{StaticResource OkBrush}" />
+                                        <TextBlock Text="{Binding StatusText}" FontSize="11.5" />
+                                    </StackPanel>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                            <Setter TargetName="Dot" Property="Fill" Value="Transparent" />
+                                            <Setter TargetName="Dot" Property="Stroke" Value="#9A9A9A" />
+                                            <Setter TargetName="Dot" Property="StrokeThickness" Value="1.5" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="No." Binding="{Binding NumberText}" SortMemberPath="Number" Width="46" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="70">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="90">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="h, m" Binding="{Binding HeightText}" SortMemberPath="Data.HeightM" Width="48" />
+                        <DataGridTextColumn Header="Base, m" Binding="{Binding BaseHeightText}" SortMemberPath="Data.BaseHeightM" Width="58" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </Border>
+
+        <TextBlock Grid.Row="2" Style="{StaticResource HintText}" Margin="0,6,0,0"
+                   Text="Inactive lightning protectors are excluded from protection-area calculations." />
+
+        <!-- Outcome of the last action -->
+        <Border Grid.Row="3" Margin="0,8,0,0" Style="{StaticResource InfoBox}"
+                Visibility="{Binding HasStatus, Converter={StaticResource BoolToVisibility}}">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="11.5" TextWrapping="Wrap" />
+        </Border>
+    </Grid>
+</UserControl>

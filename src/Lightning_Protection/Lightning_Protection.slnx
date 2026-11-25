@@ -2,5 +2,6 @@
   <Project Path="LP.Core.Tests/LP.Core.Tests.csproj" />
   <Project Path="LP.Core/LP.Core.csproj" />
   <Project Path="LP.Plugin\LP.Plugin.csproj" Type="Classic C#" />
+  <Project Path="LP.UI.App/LP.UI.App.csproj" />
   <Project Path="LP.UI/LP.UI.csproj" />
 </Solution>

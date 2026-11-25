@@ -114,7 +114,7 @@ Model space regardless of active tab: `SymbolUtilityServices.GetBlockModelSpaceI
 > The guide uses `ObjectContexts.AddContext/RemoveContext/HasContext/GetContextNames`; that static class lives in
 > `Autodesk.AutoCAD.Internal` and its overloads differ between releases. The helpers here use the public
 > instance methods `DBObject.AddContext / HasContext / RemoveContext`, which exist in both AutoCAD 2024 (24.3, net48)
-> and AutoCAD 2025+ (25.x, net8.0).
+> and AutoCAD 2025+ (25.x, net8.0-windows).
 
 ## Errors
 

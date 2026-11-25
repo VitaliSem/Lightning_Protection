@@ -4,26 +4,25 @@ Project-specific guidance for `LP.Plugin`, the AutoCAD plugin. Cross-project rul
 
 ## Targets and compatibility
 
-SDK-style, multi-target `net8.0;net48`:
+SDK-style, multi-target `net8.0-windows;net48`, `UseWPF` (to host the LP.UI window):
 - `net48` → `AutoCAD.NET` NuGet package **24.3.0** (AutoCAD 2024)
-- `net8.0` → `AutoCAD.NET.Core` NuGet package **25.0.0** (AutoCAD 2025+)
-- both with `ExcludeAssets=runtime` (AutoCAD supplies the DLLs at load time)
+- `net8.0-windows` → `AutoCAD.NET` **25.0.0** plus an explicit `AutoCAD.NET.Core` **25.0.0** (AutoCAD 2025+). `AutoCAD.NET` 25.0.0 declares a dependency on the unpublished `AutoCAD.NET.Core 25.0.0-V058`, so Core is pinned directly and `NU1608` is suppressed.
+- all with `ExcludeAssets=runtime` (AutoCAD supplies the DLLs at load time)
+- references LP.Core and LP.UI
 - `LangVersion 12`, `ImplicitUsings` and `Nullable` enabled
 
 Code must compile for both targets:
-- use `Autodesk.AutoCAD.ApplicationServices.Core.Application` (AcCoreMgd) — the full `ApplicationServices.Application` lives in AcMgd, which the `net8.0` target does not reference;
+- prefer `Autodesk.AutoCAD.ApplicationServices.Core.Application` (AcCoreMgd, aliased `AcApp`); use the full `ApplicationServices.Application` (AcMgd) only for what Core lacks, such as `ShowModelessWindow`;
 - C# 12 syntax is fine, but avoid runtime-dependent features missing in net48 (records/`init`, `required`, `Index`/`Range`, default interface members) and BCL APIs absent in net48 (`Math.Clamp`, `ArgumentNullException.ThrowIfNull`, `string.Contains(char)`, `[NotNullWhen]` and other nullable attributes);
 - use `#if NET8_0_OR_GREATER` for version-specific code.
-
-`LP.UI` targets net48 only, so the `net8.0` build cannot reference it as-is.
 
 ## Folder layout
 
 - `Acad/` — generic AutoCAD API helpers adapted from the `autocad-api` skill: `BlockHelper` (definitions, inserts, references), `BlockAttributeHelper` (attribute definitions and references, reading and writing values), `LayerHelper`, `ScaleHelper`, `PromptHelper` (reusable `TryGet...` editor prompts for commands), `ViewHelper` (layout switching, entity extents, zooming the current view to a WCS window).
-- `Drawing/` — protector-specific drawing code: block definitions, ProtectionArea → AutoCAD entities, locating protector references.
+- `Drawing/` — protector-specific drawing code: block definitions, ProtectionArea → AutoCAD entities, locating protector references, `AcadLightningProtectorRepository` (the drawing as LP.Core `ILightningProtectorRepository` for the UI).
 - `Commands/` — `[CommandMethod]` classes, each with a `<Name>Prompts` class holding its prompt texts and prompt DTOs.
 - `Models/` — DTOs: `LayerDto`, `BlockDefinitionDto`, `AttributeDefinitionDto`, `BlockInsertDto`, `TextPromptDto`, `NumberPromptDto`, `LightningProtectorReferenceDto`.
-- `Constants/` — names that must not be hard-coded elsewhere: `AcadConstants` (AutoCAD key names such as object context collections) and `CommandNames` (names of `[CommandMethod]` commands).
+- `Constants/` — names that must not be hard-coded elsewhere: `AcadConstants` (AutoCAD key names such as object context collections) and `CommandNames` (names of `[CommandMethod]` commands, grouped in nested classes by command class: `LightningProtector`, `UserInterface`).
 
 Methods that would take more than 3 parameters take a DTO instead.
 
@@ -36,6 +35,12 @@ Methods that would take more than 3 parameters take a DTO instead.
 - `lightning_protector_focus` (same class) finds a protector block by its `NUMBER` attribute, makes the Model tab or the layout that owns it current (paper space on a layout), zooms so the block's extents fill a fixed share of the view (window size from LP.Core `ViewFocusService`), and leaves the block selected (`CommandFlags.Redraw` keeps the implied selection). It warns when the block's layer is off or frozen; the drawing itself is never modified.
 - `Drawing/LightningProtectorFinder` locates protector references: `FindAll`, `GetExistingNumbers`, and `FindByNumber` (returns `OperationResult<LightningProtectorReferenceDto>`, failing with a ready message when the number is missing or duplicated). Reuse it in any command that works on a protector by its number (edit, delete, …).
 - Command pattern: get the active document via `AcApp.DocumentManager.MdiActiveDocument`, collect input with `PromptHelper` before opening a transaction, check every `OperationResult` and print its `Message`, and catch `Autodesk.AutoCAD.Runtime.Exception` and `System.Exception` separately.
+
+## UI window
+
+- `lightning_protection_ui` (`Commands/UserInterfaceCommands`) opens the LP.UI `MainWindow` as a modeless window (`Application.ShowModelessWindow`, AcMgd). One window per session: running the command again restores and activates it.
+- The window gets a `Drawing/AcadLightningProtectorRepository`, which always works on the *active* document; for now it only names the source drawing (reading and changing protectors come in a follow-up task). The window is modeless, so any future drawing access must take `doc.LockDocument()`.
+- The window refreshes whenever it is activated, so switching drawings shows up when the user returns to it.
 
 ## AutoCAD API reference
 
