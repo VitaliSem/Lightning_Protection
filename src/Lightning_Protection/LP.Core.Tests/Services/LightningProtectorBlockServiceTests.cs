@@ -346,7 +346,11 @@ public class LightningProtectorBlockServiceTests
 
         Assert.True(result.IsSuccess);
         Assert.Equal(string.Empty, result.Result.Name);
+        Assert.Equal(string.Empty, result.Result.Title);
+        Assert.Equal(string.Empty, result.Result.Type);
+        Assert.Equal(string.Empty, result.Result.Description);
         Assert.Equal(12, result.Result.HeightM);
+        Assert.Null(result.Result.BaseHeightM);
         Assert.True(result.Result.IsActive);
     }
 

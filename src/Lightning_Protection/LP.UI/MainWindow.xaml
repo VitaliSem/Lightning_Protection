@@ -5,7 +5,7 @@
         xmlns:views="clr-namespace:LP.UI.Views"
         Title="{Binding WindowTitle}"
         Icon="{DynamicResource AppIcon}"
-        Width="760" Height="600"
+        Width="960" Height="600"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBackgroundBrush}"
