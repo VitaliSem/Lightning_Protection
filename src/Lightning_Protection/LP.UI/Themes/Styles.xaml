@@ -28,6 +28,8 @@
     <Geometry x:Key="IconAdd">M8,3 V13 M3,8 H13</Geometry>
     <Geometry x:Key="IconEdit">M3,13 L4,10 L10.5,3.5 L12.5,5.5 L6,12 Z</Geometry>
     <Geometry x:Key="IconDelete">M4,5 H12 L11.3,13 H4.7 Z M3,5 H13 M6,5 V3 H10 V5</Geometry>
+    <Geometry x:Key="IconGoTo">M2,6 V2 H6 M10,2 H14 V6 M14,10 V14 H10 M6,14 H2 V10 M6.5,8 A1.5,1.5 0 1 1 9.5,8 A1.5,1.5 0 1 1 6.5,8</Geometry>
+    <Geometry x:Key="IconInfo">M2.5,8 A5.5,5.5 0 1 1 13.5,8 A5.5,5.5 0 1 1 2.5,8 M8,7 V11.5 M8,4.6 V5.6</Geometry>
 
     <DrawingImage x:Key="AppIcon">
         <DrawingImage.Drawing>
@@ -91,6 +93,31 @@
                             <Setter Property="Foreground" Value="{StaticResource DisabledBrush}" />
                             <Setter Property="Cursor" Value="Arrow" />
                             <Setter TargetName="Bd" Property="Background" Value="#F7F7F7" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Small borderless icon button (grid rows) -->
+    <Style x:Key="BtnGhostIcon" TargetType="Button" BasedOn="{StaticResource Btn}">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="4" SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource GhostHoverBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

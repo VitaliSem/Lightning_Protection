@@ -25,6 +25,7 @@ dotnet build LP.Plugin/LP.Plugin.csproj -f net8.0-windows    # AutoCAD 2025+
 
 # Run all tests
 dotnet test LP.Core.Tests/LP.Core.Tests.csproj
+dotnet test LP.UI.Tests/LP.UI.Tests.csproj
 
 # Run tests with verbose output
 dotnet test LP.Core.Tests/LP.Core.Tests.csproj -v n
@@ -59,7 +60,8 @@ AutoCAD extension for calculating and visualizing lightning protection areas acc
 - **LP.Core.Tests** (`net8.0`, xUnit, `Xunit` as a global using) — Unit tests for LP.Core calculation services.
 - **LP.Plugin** (SDK-style with `UseWPF`, multi-target `net8.0-windows;net48`) — the single AutoCAD plugin project: `net48` for AutoCAD 2024, `net8.0-windows` for AutoCAD 2025+; references LP.Core and LP.UI (packages and compatibility rules in `LP.Plugin/AGENTS.md`).
 - **LP.UI** (SDK-style WPF library, multi-target `net8.0-windows;net48`) — the main window with its sidebar and the Lightning protectors page; references LP.Core only. Opened in AutoCAD by the `lightning_protection_ui` command of LP.Plugin.
-- **LP.UI.App** (`net8.0-windows`, WPF `WinExe`) — standalone launcher that runs the LP.UI window without AutoCAD.
+- **LP.UI.App** (`net8.0-windows`, WPF `WinExe`) — standalone launcher that runs the LP.UI window without AutoCAD, with sample protectors.
+- **LP.UI.Tests** (`net8.0-windows`, xUnit, `Xunit` as a global using) — Unit tests for the LP.UI view models.
 
 The `packages/AutoCAD.NET.*.24.0.0/` folder is a gitignored leftover of the former `packages.config` setup; LP.Plugin restores AutoCAD packages from NuGet via `PackageReference`.
 
@@ -77,7 +79,7 @@ The AutoCAD abstractions in `LP.Core` (`IAcadDocument`, `IAcadTransaction`) are 
 
 ### Conventions
 
-- LP.Core is C# 7.3 without nullable or implicit usings; LP.Core.Tests, LP.Plugin and LP.UI use implicit usings and nullable (details in each project's `AGENTS.md`).
+- LP.Core is C# 7.3 without nullable or implicit usings; LP.Core.Tests, LP.UI.Tests, LP.Plugin and LP.UI use implicit usings and nullable (details in each project's `AGENTS.md`).
 - Callers check `OperationResult.IsSuccess` and propagate `Message` / `Exception`; don't throw across project boundaries.
 - `/// <summary>` comments on methods:
   - add one only when the method has complex logic. Leave out summaries on simple or self-explanatory methods (getters, thin wrappers, one-line lookups);
@@ -91,4 +93,4 @@ The AutoCAD abstractions in `LP.Core` (`IAcadDocument`, `IAcadTransaction`) are 
 - Double rod protection area — **implemented** (`DoubleRodProtectionService`, with tests); geometry of the combined outline still to be verified against the standard
 - Double wire protection area — **not implemented** (throws `NotImplementedException`)
 - AutoCAD plugin (`LP.Plugin`) — **in progress**: `lightning_protector_insert`, `lightning_protector_edit`, `lightning_protector_toggle_active`, `lightning_protector_delete` and `lightning_protector_focus` implemented; protection-area drawing commands not yet
-- WPF UI (`LP.UI`) — **in progress**: main window with the Lightning protectors page, opened in AutoCAD by `lightning_protection_ui` or standalone by `LP.UI.App`; loading protectors into the grid, the toolbar actions (add, edit, delete, active toggle), settings and calculation-method pages not yet
+- WPF UI (`LP.UI`) — **in progress**: main window with the Lightning protectors page, opened in AutoCAD by `lightning_protection_ui` or standalone by `LP.UI.App`; the grid lists the drawing's protectors (attributes, X; Y, go-to-drawing button); the toolbar actions (add, edit, delete, active toggle), settings and calculation-method pages not yet

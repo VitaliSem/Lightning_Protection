@@ -15,10 +15,14 @@ public static class LightningProtectorFinder
     private const string NotFoundMessage = "Lightning protector #{0} not found.";
     private const string DuplicateNumberMessage = "Several lightning protectors have number #{0}; fix the numbering first.";
 
-    /// <summary>Returns all lightning protector references in model space and layouts with their attribute values.</summary>
+    /// <summary>
+    /// Returns all lightning protector references in model space and layouts with their attribute values,
+    /// insertion points and, for references in paper space, the name of their layout.
+    /// </summary>
     public static List<LightningProtectorReferenceDto> FindAll(Transaction tr, Database db)
     {
         var protectors = new List<LightningProtectorReferenceDto>();
+        ObjectId modelSpaceId = SymbolUtilityServices.GetBlockModelSpaceId(db);
 
         foreach (ObjectId refId in BlockHelper.FindBlockReferences(tr, db, LightningProtectorBlockService.BlockName))
         {
@@ -28,6 +32,8 @@ public static class LightningProtectorFinder
             {
                 Id = refId,
                 AttributeValues = BlockAttributeHelper.GetAttributeValues(tr, br),
+                Position = br.Position,
+                LayoutName = br.OwnerId == modelSpaceId ? null : ViewHelper.GetLayoutName(tr, br.OwnerId),
             });
         }
 

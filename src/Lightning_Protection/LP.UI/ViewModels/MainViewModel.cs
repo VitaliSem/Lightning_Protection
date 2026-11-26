@@ -15,7 +15,7 @@ public class MainViewModel : ObservableObject
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _sourceName = repository.SourceName;
-        Pages = [new LightningProtectorsPageViewModel()];
+        Pages = [new LightningProtectorsPageViewModel(repository)];
         _selectedPage = Pages[0];
     }
 
