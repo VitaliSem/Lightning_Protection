@@ -1,0 +1,89 @@
+src/Lightning_Protection/LP.Core/AGENTS.md
+  s_c9da5c955b19eb::t_c34d28967237c9 37,65
+src/Lightning_Protection/LP.Plugin/AGENTS.md
+  s_c9da5c955b19eb::t_6ea204d452fda7 31,45-47
+src/Lightning_Protection/LP.UI.Tests/Fakes/FakeDialogService.cs
+  s_c9da5c955b19eb::t_2a98206867ab15 1-30
+src/Lightning_Protection/LP.UI.Tests/Fakes/FakeLightningProtectorRepository.cs
+  s_c9da5c955b19eb::t_ff96847df31699 5,18-25,28-50
+src/Lightning_Protection/LP.UI.Tests/ViewModels/LightningProtectorsPageViewModelTests.cs
+  s_c9da5c955b19eb::t_fa3c5024fc597e 3,5,12,16,113-114,203-262
+src/Lightning_Protection/LP.UI/Services/DialogService.cs
+  s_c9da5c955b19eb::t_d768a9daa73502 1-40
+src/Lightning_Protection/LP.UI/Services/IDialogService.cs
+  s_c9da5c955b19eb::t_b480a00ce1bd0d 1-10
+src/Lightning_Protection/LP.UI/ViewModels/LightningProtectorsPageViewModel.cs
+  s_c9da5c955b19eb::t_c4dab65d3ded3d 7,9,16,19,25,28,30-32,123-141
+src/Lightning_Protection/LP.UI/ViewModels/MainViewModel.cs
+  s_c9da5c955b19eb::t_0a9e9967116454 4,15,19
+CLAUDE.md
+  s_c9da5c955b19eb::t_ebcf5a0462a0af 96
+src/Lightning_Protection/LP.Core/Interfaces/ILightningProtectorRepository.cs
+  s_c9da5c955b19eb::t_cfac2ed8d33ee9 17-22
+src/Lightning_Protection/LP.Core/Models/LightningProtectors/Block/LightningProtectorInsertDto.cs
+  s_c9da5c955b19eb::t_3a72193794ed57 1-15
+src/Lightning_Protection/LP.Core/Models/LightningProtectors/Block/LightningProtectorTypeOption.cs
+  s_c9da5c955b19eb::t_e44a4211616fd5 1-32
+src/Lightning_Protection/LP.Plugin/Acad/PromptHelper.cs
+  s_c9da5c955b19eb::t_ee8aca6ec2dc38 159-172
+src/Lightning_Protection/LP.Plugin/Commands/LightningProtectorCommands.cs
+  s_c9da5c955b19eb::t_6b7d090282548c 40,47-48,50,53,66
+src/Lightning_Protection/LP.Plugin/Commands/LightningProtectorPrompts.cs
+  s_c9da5c955b19eb::t_3ed52249a4159e 1,15-16,45-49,90-95
+src/Lightning_Protection/LP.Plugin/Drawing/AcadLightningProtectorRepository.cs
+  s_c9da5c955b19eb::t_32e19cccf92f4c 3,8-9,25,113-173
+src/Lightning_Protection/LP.Plugin/Drawing/LightningProtectorInsert.cs
+  s_c9da5c955b19eb::t_6b4fb482b0fab6 1-49
+src/Lightning_Protection/LP.UI.App/Services/InMemoryLightningProtectorRepository.cs
+  s_c9da5c955b19eb::t_015537150bafba 1,5,11-12,28-49
+src/Lightning_Protection/LP.UI.Tests/ViewModels/AddLightningProtectorViewModelTests.cs
+  s_c9da5c955b19eb::t_0632cb9c948357 1-393
+src/Lightning_Protection/LP.UI/AGENTS.md
+  s_c9da5c955b19eb::t_d01c71e0d743c1 13,27-41,50-60,64
+src/Lightning_Protection/LP.UI/Infrastructure/ValidatableViewModel.cs
+  s_c9da5c955b19eb::t_b5c6757291afed 1-42
+src/Lightning_Protection/LP.UI/MainWindow.xaml.cs
+  s_c9da5c955b19eb::t_492c0b828f4373 3,14
+src/Lightning_Protection/LP.UI/Themes/Colors.xaml
+  s_c9da5c955b19eb::t_a48ba13fc5fc6b 1-26
+src/Lightning_Protection/LP.UI/Themes/Controls/Buttons.xaml
+  s_c9da5c955b19eb::t_a64c147a800cdb 1-142
+src/Lightning_Protection/LP.UI/Themes/Controls/Containers.xaml
+  s_c9da5c955b19eb::t_641dffb317ae71 1-27
+src/Lightning_Protection/LP.UI/Themes/Controls/DataGrid.xaml
+  s_c9da5c955b19eb::t_5052b57189f746 1-57
+src/Lightning_Protection/LP.UI/Themes/Controls/Inputs.xaml
+  s_c9da5c955b19eb::t_b245482bb02e06 1-90
+src/Lightning_Protection/LP.UI/Themes/Controls/Navigation.xaml
+  s_c9da5c955b19eb::t_e0b19149c1a699 1-43
+src/Lightning_Protection/LP.UI/Themes/Icons.xaml
+  s_c9da5c955b19eb::t_16b0f729203ed4 1-31
+src/Lightning_Protection/LP.UI/Themes/Styles.xaml
+  s_c9da5c955b19eb::t_67749935487488 2-13
+src/Lightning_Protection/LP.UI/Themes/Typography.xaml
+  s_c9da5c955b19eb::t_c0e6ee6f2518d8 1-26
+src/Lightning_Protection/LP.UI/ViewModels/AddLightningProtectorViewModel.cs
+  s_c9da5c955b19eb::t_0a3313101804cd 1-254
+src/Lightning_Protection/LP.UI/Views/AddLightningProtectorDialog.xaml
+  s_c9da5c955b19eb::t_abbd3276962611 1-169
+src/Lightning_Protection/LP.UI/Views/AddLightningProtectorDialog.xaml.cs
+  s_c9da5c955b19eb::t_34873638b5dff1 1-17
+src/Lightning_Protection/LP.UI/Views/LightningProtectorsPage.xaml.cs
+  s_c9da5c955b19eb::t_29e09f350f2da0 10-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "602d82333d930d88f425d713bacae5713705ef8f",
+  "prompts": {},
+  "sessions": {
+    "s_c9da5c955b19eb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3893804a-ae08-4cf1-8bb5-ac475019d1be",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Vitali.Siamashka <vitali.siamashka@ventionteams.com>"
+    }
+  }
+}
