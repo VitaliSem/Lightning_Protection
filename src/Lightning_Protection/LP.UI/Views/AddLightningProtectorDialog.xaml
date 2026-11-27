@@ -1,0 +1,169 @@
+<Window x:Class="LP.UI.Views.AddLightningProtectorDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:LP.UI.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:AddLightningProtectorViewModel}"
+        Title="{Binding WindowTitle}"
+        Icon="{DynamicResource AppIcon}"
+        Width="420" SizeToContent="Height"
+        ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        FocusManager.FocusedElement="{Binding ElementName=NameBox}"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextBrush}"
+        FontFamily="Segoe UI" FontSize="13">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LP.UI;component/Themes/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+            <!-- Not shared: every type option gets its own tooltip instance -->
+            <ToolTip x:Key="TypeToolTip" x:Shared="False">
+                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" MaxWidth="300" />
+            </ToolTip>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- Footer -->
+        <Border DockPanel.Dock="Bottom" Background="White" BorderBrush="{StaticResource BorderSoftBrush}" BorderThickness="0,1,0,0"
+                Padding="12,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Style="{StaticResource Btn}" Content="Cancel" MinWidth="76" Margin="0,0,8,0" IsCancel="True" />
+                <Button Style="{StaticResource BtnPrimary}" MinWidth="76" IsDefault="True" Command="{Binding AddCommand}"
+                        AutomationProperties.Name="Add">
+                    <StackPanel Orientation="Horizontal">
+                        <Path Style="{StaticResource IconPath}" Data="{StaticResource IconAdd}" StrokeThickness="1.6" Margin="0,0,5,0" />
+                        <TextBlock Text="Add" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <!-- Fields -->
+        <StackPanel Margin="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" Style="{StaticResource FieldLabel}" />
+                <TextBox Grid.Row="1" Grid.Column="0" x:Name="NameBox" Style="{StaticResource Input}"
+                         Margin="{StaticResource ValidatedFieldMargin}" MaxLength="{Binding MaxNameLength, Mode=OneTime}"
+                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Name"
+                         ToolTip="Short designation shown on the drawing, e.g. MP-7" />
+
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="Title" Style="{StaticResource FieldLabel}" />
+                <TextBox Grid.Row="1" Grid.Column="2" Style="{StaticResource Input}"
+                         Margin="{StaticResource ValidatedFieldMargin}" MaxLength="{Binding MaxTitleLength, Mode=OneTime}"
+                         Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Title"
+                         ToolTip="Full title, e.g. Mast MM-30" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding NumberHintText}"
+                           Style="{StaticResource HintText}" Margin="0,0,0,12" />
+            </Grid>
+
+            <!-- Type (optional, None by default): each option shows its description as a tooltip -->
+            <TextBlock Text="Type" Style="{StaticResource FieldLabel}" />
+            <ComboBox Style="{StaticResource Select}" Margin="0,0,0,12" AutomationProperties.Name="Type"
+                      ItemsSource="{Binding Types}" SelectedItem="{Binding SelectedType}" DisplayMemberPath="Name">
+                <ComboBox.ToolTip>
+                    <TextBlock Text="{Binding SelectedType.Description}" TextWrapping="Wrap" MaxWidth="300" />
+                </ComboBox.ToolTip>
+                <ComboBox.ItemContainerStyle>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Padding" Value="8,5" />
+                        <Setter Property="ToolTip" Value="{StaticResource TypeToolTip}" />
+                    </Style>
+                </ComboBox.ItemContainerStyle>
+            </ComboBox>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource FieldLabel}">
+                    <Run Text="Height h" /><Run Text=" *" Foreground="{StaticResource DangerBrush}" />
+                </TextBlock>
+                <TextBox Grid.Row="1" Grid.Column="0" Style="{StaticResource UnitInput}" Tag="m" Margin="{StaticResource ValidatedFieldMargin}"
+                         Text="{Binding HeightText, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Height" />
+
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="Base height" Style="{StaticResource FieldLabel}" />
+                <TextBox Grid.Row="1" Grid.Column="2" Style="{StaticResource UnitInput}" Tag="m" Margin="{StaticResource ValidatedFieldMargin}"
+                         Text="{Binding BaseHeightText, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Base height"
+                         ToolTip="Elevation of the protector base; leave empty when not set" />
+            </Grid>
+
+            <TextBlock Style="{StaticResource FieldLabel}">
+                <Run Text="Position on the drawing" /><Run Text=" *" Foreground="{StaticResource DangerBrush}" />
+            </TextBlock>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- X and Y share one error: their boxes are only outlined, the message is at the bottom of the form -->
+                <TextBox Grid.Column="0" Style="{StaticResource UnitInput}" Tag="X"
+                         Validation.ErrorTemplate="{StaticResource GroupErrorTemplate}"
+                         Text="{Binding XText, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="X" />
+                <TextBox Grid.Column="2" Style="{StaticResource UnitInput}" Tag="Y"
+                         Validation.ErrorTemplate="{StaticResource GroupErrorTemplate}"
+                         Text="{Binding YText, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Y" />
+                <Button Grid.Column="4" Style="{StaticResource Btn}" Command="{Binding PickCommand}" AutomationProperties.Name="Pick"
+                        ToolTip="Pick the position on the drawing">
+                    <StackPanel Orientation="Horizontal">
+                        <Path Style="{StaticResource IconPath}" Data="{StaticResource IconPick}" Margin="0,0,5,0" />
+                        <TextBlock Text="Pick" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+            <TextBlock Text="World coordinates of the current space (model space or the current layout)."
+                       Style="{StaticResource HintText}" Margin="0,4,0,12" />
+
+            <TextBlock Text="Description" Style="{StaticResource FieldLabel}" />
+            <TextBox Style="{StaticResource Input}" Height="Auto" MinHeight="48" Padding="6,4" VerticalContentAlignment="Top"
+                     TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" MaxHeight="96"
+                     Margin="{StaticResource ValidatedFieldMargin}" MaxLength="{Binding MaxDescriptionLength, Mode=OneTime}"
+                     Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Description"
+                     ToolTip="Free text stored in the block attributes, e.g. On the roof of building 2" />
+
+            <CheckBox Style="{StaticResource Check}" Margin="0" IsChecked="{Binding IsActive, Mode=OneWay}" IsEnabled="False"
+                      Content="Active (included in protection-area calculations)" />
+            <TextBlock Text="A new lightning protector is always added as active." Style="{StaticResource HintText}"
+                       Margin="20,0,0,6" />
+            <CheckBox Style="{StaticResource Check}" IsChecked="{Binding SaveAsTemplate, Mode=OneWay}" IsEnabled="{Binding CanSaveAsTemplate}"
+                      Content="Save to database as a template"
+                      ToolTip="Not available yet" ToolTipService.ShowOnDisabled="True" />
+
+            <!-- Errors shared by several fields (the coordinates) and the outcome of a failed insertion or pick -->
+            <Border Style="{StaticResource ErrorBox}" Margin="0,8,0,0"
+                    Visibility="{Binding HasErrorMessage, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock Text="{Binding ErrorMessage}" FontSize="11.5" TextWrapping="Wrap" />
+            </Border>
+        </StackPanel>
+    </DockPanel>
+</Window>

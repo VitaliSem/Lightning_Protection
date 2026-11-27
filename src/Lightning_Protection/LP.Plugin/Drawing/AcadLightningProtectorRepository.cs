@@ -1,9 +1,12 @@
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using LP.Core.Interfaces;
 using LP.Core.Models.Base;
 using LP.Core.Models.LightningProtectors.Block;
 using LP.Core.Services;
+using LP.Plugin.Acad;
+using LP.Plugin.Commands;
 using LP.Plugin.Models;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using AcException = Autodesk.AutoCAD.Runtime.Exception;
@@ -19,6 +22,7 @@ namespace LP.Plugin.Drawing;
 public class AcadLightningProtectorRepository : ILightningProtectorRepository
 {
     private const string NoDrawingMessage = "No drawing is open.";
+    private const string NoPointPickedMessage = "No position was picked on the drawing.";
 
     public string SourceName
     {
@@ -104,6 +108,67 @@ public class AcadLightningProtectorRepository : ILightningProtectorRepository
         catch (System.Exception ex)
         {
             return OperationResult<string>.Fail("Error: " + ex.Message, ex);
+        }
+    }
+
+    public OperationResult<LightningProtectorBlockData> Insert(LightningProtectorInsertDto dto)
+    {
+        Document? doc = AcApp.DocumentManager.MdiActiveDocument;
+
+        if (doc is null)
+            return OperationResult<LightningProtectorBlockData>.Fail(NoDrawingMessage);
+
+        try
+        {
+            using (doc.LockDocument())
+            using (Transaction tr = doc.Database.TransactionManager.StartTransaction())
+            {
+                OperationResult<LightningProtectorBlockData> result = LightningProtectorInsert.Insert(tr, doc.Database, dto);
+
+                if (result.IsSuccess)
+                    tr.Commit();
+
+                return result;
+            }
+        }
+        catch (AcException ex)
+        {
+            return OperationResult<LightningProtectorBlockData>.Fail(
+                $"AutoCAD error while inserting the lightning protector: {ex.ErrorStatus} - {ex.Message}", ex);
+        }
+        catch (System.Exception ex)
+        {
+            return OperationResult<LightningProtectorBlockData>.Fail(
+                "Error while inserting the lightning protector: " + ex.Message, ex);
+        }
+    }
+
+    public OperationResult<Point3D> PickPosition()
+    {
+        Document? doc = AcApp.DocumentManager.MdiActiveDocument;
+
+        if (doc is null)
+            return OperationResult<Point3D>.Fail(NoDrawingMessage);
+
+        try
+        {
+            AcUtils.SetFocusToDwgView();
+
+            using (doc.LockDocument())
+            {
+                if (!PromptHelper.TryGetPoint(doc.Editor, LightningProtectorPrompts.InsertionPoint, out Point3d point))
+                    return OperationResult<Point3D>.Fail(NoPointPickedMessage);
+
+                return OperationResult<Point3D>.Ok(new Point3D(point.X, point.Y, point.Z));
+            }
+        }
+        catch (AcException ex)
+        {
+            return OperationResult<Point3D>.Fail($"AutoCAD error: {ex.ErrorStatus} - {ex.Message}", ex);
+        }
+        catch (System.Exception ex)
+        {
+            return OperationResult<Point3D>.Fail("Error: " + ex.Message, ex);
         }
     }
 }

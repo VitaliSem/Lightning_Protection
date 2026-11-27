@@ -1,12 +1,15 @@
+using System.Globalization;
 using LP.Core.Interfaces;
 using LP.Core.Models.Base;
 using LP.Core.Models.LightningProtectors.Block;
+using LP.Core.Services;
 
 namespace LP.UI.App.Services;
 
 /// <summary>
 /// Repository that is not connected to a drawing; used to run the window without AutoCAD.
-/// Holds sample protectors so the table (empty optional values, paper space, scrolling) can be checked by eye.
+/// Holds sample protectors so the table (empty optional values, paper space, scrolling) can be checked by eye;
+/// added protectors are kept in memory, positions cannot be picked.
 /// </summary>
 public class InMemoryLightningProtectorRepository : ILightningProtectorRepository
 {
@@ -21,6 +24,28 @@ public class InMemoryLightningProtectorRepository : ILightningProtectorRepositor
 
     public OperationResult<string> Focus(int number) =>
         OperationResult<string>.Fail($"Not connected to a drawing: lightning protector #{number} cannot be shown.");
+
+    public OperationResult<LightningProtectorBlockData> Insert(LightningProtectorInsertDto dto)
+    {
+        OperationResult<LightningProtectorBlockData> result = LightningProtectorBlockService.Create(new LightningProtectorBlockCreateDto
+        {
+            ExistingNumbers = _entries.Select(e => e.Data.Number.ToString(CultureInfo.InvariantCulture)),
+            Name = dto.Name,
+            Title = dto.Title,
+            Type = dto.Type,
+            HeightM = dto.HeightM,
+            BaseHeightM = dto.BaseHeightM,
+            Description = dto.Description,
+        });
+
+        if (result.IsSuccess)
+            _entries.Add(new LightningProtectorListEntry(result.Result, dto.Position));
+
+        return result;
+    }
+
+    public OperationResult<Point3D> PickPosition() =>
+        OperationResult<Point3D>.Fail("Not connected to a drawing: enter X and Y instead of picking the position.");
 
     private static List<LightningProtectorListEntry> CreateSamples()
     {

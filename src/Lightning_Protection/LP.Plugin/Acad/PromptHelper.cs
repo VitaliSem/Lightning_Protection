@@ -156,6 +156,20 @@ public static class PromptHelper
         return res.Status is PromptStatus.OK or PromptStatus.None;
     }
 
+    /// <summary>Prompts for one of the keywords, which the message lists itself; an empty input chooses none.</summary>
+    public static bool TryGetOptionalKeyword(Editor ed, string message, IEnumerable<string> keywords, out string? keyword)
+    {
+        var pko = new PromptKeywordOptions(message) { AllowNone = true, AppendKeywordsToMessage = false };
+
+        foreach (string kw in keywords)
+            pko.Keywords.Add(kw);
+
+        PromptResult res = ed.GetKeywords(pko);
+        keyword = res.Status == PromptStatus.OK && !string.IsNullOrEmpty(res.StringResult) ? res.StringResult : null;
+
+        return res.Status is PromptStatus.OK or PromptStatus.None;
+    }
+
     /// <summary>Prompts for a required positive number, repeating the prompt until the value is within the limit.</summary>
     public static bool TryGetPositiveDouble(Editor ed, NumberPromptDto prompt, out double value)
     {

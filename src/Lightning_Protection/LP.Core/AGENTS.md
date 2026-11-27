@@ -34,7 +34,7 @@ Protector models in `Models/LightningProtectors/<Type>/` (namespace `LP.Core.Mod
 - `DoubleRod/DoubleRodLightningProtector` — two SingleRodLightningProtectors (composite)
 - `DoubleRod/DoubleRodProtectionArea` — both rod areas + zone parameters (h0, r0, L, Lmax, Lc, hc, IsCombined, rx, lx, rcx, lx1, lx2)
 - `DoubleWire/DoubleWireLightningProtector` — two SingleWireLightningProtectors (composite)
-- `Block/` — lightning protector block data: `LightningProtectorBlockData`, `LightningProtectorBlockCreateDto`, `LightningProtectorBlockUpdateDto`, `LightningProtectorListEntry` (block data with its insertion point and, for paper space, its layout name; one row of the UI table)
+- `Block/` — lightning protector block data: `LightningProtectorBlockData`, `LightningProtectorBlockCreateDto`, `LightningProtectorBlockUpdateDto`, `LightningProtectorInsertDto` (create values plus the position, input of `ILightningProtectorRepository.Insert`), `LightningProtectorTypeOption` (name and description of a protector type; `All` is the fixed list of five types, hard-coded until the types come from the database, used by the UI add dialog and the insert command), `LightningProtectorListEntry` (block data with its insertion point and, for paper space, its layout name; one row of the UI table)
 
 `ProtectionArea` convention: `Radius == null` → straight segment starts at the point; `Radius` set → arc of that radius starts at the point; `IsLastPoint == true` closes the outline; a single point with a radius is a circle. The double-rod non-combined result is two points with radii = two separate circles (point = centre).
 
@@ -62,7 +62,7 @@ Other services (`Services/`):
 ## Key Interfaces (`Interfaces/`)
 
 - `ILightningProtectionService` — main service contract (single rod, single wire, double rod, double wire)
-- `ILightningProtectorRepository` — source of lightning protectors for the UI: the source name, `GetAll` (protectors ordered by number) and `Focus` (show one protector by number; the message describes the outcome); changing protectors comes in a follow-up task. Implemented by LP.Plugin for the active drawing and by LP.UI.App without a drawing
+- `ILightningProtectorRepository` — source of lightning protectors for the UI: the source name, `GetAll` (protectors ordered by number), `Focus` (show one protector by number; the message describes the outcome), `Insert` (add a protector from a `LightningProtectorInsertDto`, numbered and active) and `PickPosition` (let the user pick a position); editing and deleting come in follow-up tasks. Implemented by LP.Plugin for the active drawing and by LP.UI.App without a drawing
 - `IAcadDocument` — document abstraction (Name, ExecuteInTransaction, GetModelSpace, Regen)
 - `IAcadTransaction` — transaction abstraction (GetObject, AddEntity, IDisposable)
 

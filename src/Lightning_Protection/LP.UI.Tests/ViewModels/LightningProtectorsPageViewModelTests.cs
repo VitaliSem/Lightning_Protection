@@ -1,17 +1,19 @@
 using LP.Core.Models.Base;
 using LP.Core.Models.LightningProtectors.Block;
+using LP.UI.Tests.Fakes;
 using LP.UI.ViewModels;
-using static LP.UI.Tests.ViewModels.FakeLightningProtectorRepository;
+using static LP.UI.Tests.Fakes.FakeLightningProtectorRepository;
 
 namespace LP.UI.Tests.ViewModels;
 
 public class LightningProtectorsPageViewModelTests
 {
     private readonly FakeLightningProtectorRepository _repository = new();
+    private readonly FakeDialogService _dialogs = new();
 
     private LightningProtectorsPageViewModel CreateLoaded()
     {
-        var page = new LightningProtectorsPageViewModel(_repository);
+        var page = new LightningProtectorsPageViewModel(_repository, _dialogs);
         page.Refresh();
         return page;
     }
@@ -108,7 +110,8 @@ public class LightningProtectorsPageViewModelTests
     {
         _repository.SetEntries(Entry(1));
         var page = CreateLoaded();
-        page.AddCommand.Execute(null);
+        page.SelectedItem = page.Items[0];
+        page.EditCommand.Execute(null);
         string message = page.StatusMessage;
 
         page.Refresh();
@@ -196,5 +199,65 @@ public class LightningProtectorsPageViewModelTests
         var page = CreateLoaded();
 
         Assert.False(page.FocusCommand.CanExecute(null));
+    }
+
+    // -------------------------------------------------------------------------
+    // Add
+    // -------------------------------------------------------------------------
+
+    [Fact]
+    public void AddCommand_OpensDialogWithNextNumber()
+    {
+        _repository.SetEntries(Entry(1), Entry(4));
+        var page = CreateLoaded();
+
+        page.AddCommand.Execute(null);
+
+        var dialog = Assert.Single(_dialogs.AddDialogs);
+        Assert.Contains("#5", dialog.NumberHintText);
+    }
+
+    [Fact]
+    public void AddCommand_Cancelled_InsertsNothingAndKeepsStatus()
+    {
+        _repository.SetEntries(Entry(1));
+        var page = CreateLoaded();
+
+        page.AddCommand.Execute(null);
+
+        Assert.Empty(_repository.Inserted);
+        Assert.Equal([1], page.Items.Select(i => i.Number));
+        Assert.False(page.HasStatus);
+    }
+
+    [Fact]
+    public void AddCommand_Confirmed_ReloadsSelectsAndReportsNewProtector()
+    {
+        _repository.SetEntries(Entry(1), Entry(2));
+        _dialogs.OnAdd = FakeDialogService.FillAndConfirm;
+        var page = CreateLoaded();
+
+        page.AddCommand.Execute(null);
+
+        Assert.Single(_repository.Inserted);
+        Assert.Equal([1, 2, 3], page.Items.Select(i => i.Number));
+        Assert.Equal(3, page.SelectedItem?.Number);
+        Assert.Equal("Lightning protector #3 added to the drawing.", page.StatusMessage);
+    }
+
+    [Fact]
+    public void AddCommand_ConfirmedButReloadFails_ShowsLoadError()
+    {
+        _dialogs.OnAdd = dialog =>
+        {
+            bool confirmed = FakeDialogService.FillAndConfirm(dialog);
+            _repository.GetAllResult = OperationResult<IReadOnlyList<LightningProtectorListEntry>>.Fail("Read failed.");
+            return confirmed;
+        };
+        var page = CreateLoaded();
+
+        page.AddCommand.Execute(null);
+
+        Assert.Equal("Read failed.", page.StatusMessage);
     }
 }

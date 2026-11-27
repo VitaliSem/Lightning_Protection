@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using LP.Core.Interfaces;
 using LP.UI.Infrastructure;
+using LP.UI.Services;
 
 namespace LP.UI.ViewModels;
 
@@ -11,11 +12,11 @@ public class MainViewModel : ObservableObject
     private PageViewModel _selectedPage;
     private string _sourceName;
 
-    public MainViewModel(ILightningProtectorRepository repository)
+    public MainViewModel(ILightningProtectorRepository repository, IDialogService dialogService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _sourceName = repository.SourceName;
-        Pages = [new LightningProtectorsPageViewModel(repository)];
+        Pages = [new LightningProtectorsPageViewModel(repository, dialogService)];
         _selectedPage = Pages[0];
     }
 

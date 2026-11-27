@@ -37,22 +37,20 @@ public class LightningProtectorCommands
             if (!PromptHelper.TryGetPoint(ed, LightningProtectorPrompts.InsertionPoint, out Point3d position)) return;
             if (!PromptHelper.TryGetString(ed, LightningProtectorPrompts.Name, out string name)) return;
             if (!PromptHelper.TryGetString(ed, LightningProtectorPrompts.Title, out string title)) return;
-            if (!PromptHelper.TryGetString(ed, LightningProtectorPrompts.Type, out string type)) return;
+            if (!PromptHelper.TryGetOptionalKeyword(ed, LightningProtectorPrompts.TypeChoice, LightningProtectorPrompts.TypeKeywords, out string? typeKeyword)) return;
             if (!PromptHelper.TryGetPositiveDouble(ed, LightningProtectorPrompts.Height, out double height)) return;
             if (!PromptHelper.TryGetOptionalDouble(ed, LightningProtectorPrompts.BaseHeight, out double? baseHeight)) return;
             if (!PromptHelper.TryGetString(ed, LightningProtectorPrompts.Description, out string description)) return;
 
             using Transaction tr = db.TransactionManager.StartTransaction();
 
-            ObjectId btrId = LightningProtectorBlock.EnsureDefinition(tr, db);
-
-            OperationResult<LightningProtectorBlockData> result = LightningProtectorBlockService.Create(
-                new LightningProtectorBlockCreateDto
+            OperationResult<LightningProtectorBlockData> result = LightningProtectorInsert.Insert(tr, db,
+                new LightningProtectorInsertDto
                 {
-                    ExistingNumbers = LightningProtectorFinder.GetExistingNumbers(tr, db),
+                    Position = new Point3D(position.X, position.Y, position.Z),
                     Name = name,
                     Title = title,
-                    Type = type,
+                    Type = LightningProtectorPrompts.TypeFromKeyword(typeKeyword),
                     HeightM = height,
                     BaseHeightM = baseHeight,
                     Description = description,
@@ -64,18 +62,8 @@ public class LightningProtectorCommands
                 return;
             }
 
-            BlockHelper.InsertAnnotativeBlock(tr, db, new BlockInsertDto
-            {
-                BlockId = btrId,
-                Position = position,
-                Layer = LightningProtectorBlockService.LayerName,
-                AttributeValues = LightningProtectorBlockService.ToAttributeValues(result.Result),
-                SpaceId = db.CurrentSpaceId,
-                AnnotationScale = db.Cannoscale.Name,
-            });
-
             tr.Commit();
-            ed.WriteMessage($"\nLightning protector #{result.Result.Number} inserted.");
+            ed.WriteMessage(string.Format(LightningProtectorPrompts.Inserted, result.Result.Number));
         }
         catch (AcException ex)
         {
