@@ -14,5 +14,11 @@ namespace LP.Core.Interfaces
 
         /// <summary>Shows the lightning protector with the given number; the message describes the outcome.</summary>
         OperationResult<string> Focus(int number);
+
+        /// <summary>Adds a new lightning protector; returns the data of the added protector.</summary>
+        OperationResult<LightningProtectorBlockData> Insert(LightningProtectorInsertDto dto);
+
+        /// <summary>Lets the user pick a position on the source; fails when no position is picked.</summary>
+        OperationResult<Point3D> PickPosition();
     }
 }

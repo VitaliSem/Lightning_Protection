@@ -1,3 +1,4 @@
+using LP.Core.Models.LightningProtectors.Block;
 using LP.Core.Services;
 using LP.Plugin.Acad;
 using LP.Plugin.Models;
@@ -11,7 +12,8 @@ public static class LightningProtectorPrompts
     public const string Number = "\nLightning protector number: ";
     public const string IsActive = "\nIs active: ";
 
-    public const string Updated = "\nLightning protector #{0} updated.";
+    public const string Inserted = "\nLightning protector #{0} inserted.";
+    public const string Updated ="\nLightning protector #{0} updated.";
     public const string Activated = "\nLightning protector #{0} is now active.";
     public const string Deactivated = "\nLightning protector #{0} is now inactive.";
     public const string Deleted = "\nLightning protector #{0} deleted.";
@@ -39,6 +41,11 @@ public static class LightningProtectorPrompts
         MaxLength = LightningProtectorBlockService.MaxTypeLength,
         FieldName = "Type",
     };
+
+    public static readonly IReadOnlyList<string> TypeKeywords =
+        LightningProtectorTypeOption.All.Select(t => ToTypeKeyword(t.Name)).ToList();
+
+    public static readonly string TypeChoice = "\nType [" + string.Join("/", TypeKeywords) + "] <none>: ";
 
     public static readonly NumberPromptDto Height = new()
     {
@@ -79,6 +86,12 @@ public static class LightningProtectorPrompts
         Unit = "m",
         DefaultValue = current,
     };
+
+    public static string TypeFromKeyword(string? keyword) =>
+        LightningProtectorTypeOption.All
+            .FirstOrDefault(t => string.Equals(ToTypeKeyword(t.Name), keyword, StringComparison.OrdinalIgnoreCase))?.Name ?? "";
+
+    private static string ToTypeKeyword(string typeName) => typeName.Replace(" ", "_");
 
     public static string ConfirmDelete(int number, string name) =>
         string.IsNullOrWhiteSpace(name)
